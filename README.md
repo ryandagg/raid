@@ -22,3 +22,21 @@ We'll do the work in two phases.
 4. create leaderboard
 
 We believe this is in the [spirit](http://forums.roguetemple.com/index.php?topic=4885.0) of the 7DRL challenge.
+
+
+## Local Development
+
+Make sure you have node and npm installed and that you have installed gulp globally.
+
+```
+cd raid/
+npm install
+npm install -g gulp
+```
+
+Then you simply build the project and start a simple server:
+```
+gulp browserify
+python -m SimpleHTTPServer
+```
+Open your browser to localhost:8000 and tada!
