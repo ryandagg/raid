@@ -96,7 +96,7 @@ var TableCell = React.createClass({
         if (this.props.inSight) {
             color = "#FFFFFF";
         }
-        if (this.props.terrain === "wall") {
+        if (this.props.terrain === 1) {
             if (this.props.inSight) {
                 color = "#333333";
             } else {
