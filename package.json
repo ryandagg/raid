@@ -1,0 +1,41 @@
+{
+  "name": "raid",
+  "version": "0.0.1",
+  "description": "Rougue AI Dungeon!.",
+  "main": "client/main.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bovard/raid"
+  },
+  "keywords": [
+    "spaces",
+    "spacifier"
+  ],
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/bovard/raid/issues"
+  },
+  "homepage": "https://github.com/bovard/raid",
+  "devDependencies": {
+    "backbone": "~1.1.2",
+    "browserify": "~7.0.0",
+    "envify": "~1.2.1",
+    "gulp": "^3.5.6",
+    "gulp-concat": "~2.1.7",
+    "gulp-jshint": "~1.4.2",
+    "gulp-rename": "~1.1.0",
+    "gulp-requirejs": "~0.1.3",
+    "gulp-uglify": "~0.3.1",
+    "jquery": "~2.1.1",
+    "marked": "~0.3.2",
+    "moment": "~2.9.0",
+    "react": "^0.10.0",
+    "react-bootstrap": "~0.11.0",
+    "reactify": "0.14.1",
+    "vinyl-transform": "~1.0.0"
+  }
+}
