@@ -2,7 +2,7 @@
 
 A Rogue-like game based on the [battlecode](http://battlecode.org) API. We hope this game will be fun and help people prepare to compete in battlecode!
 
-Check out the [latest version](bovard.github.io/raid)!
+Check out the [latest version](http://bovard.github.io/raid/)!
 
 We're going to program this during the 2016 [7DRL](http://7drl.org/) challenge. 
 
