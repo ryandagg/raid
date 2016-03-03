@@ -26,17 +26,16 @@ We believe this is in the [spirit](http://forums.roguetemple.com/index.php?topic
 
 ## Local Development
 
-Make sure you have node and npm installed and that you have installed gulp globally.
+Make sure you have node and npm installed.
 
 ```
 cd raid/
 npm install
-npm install -g gulp
 ```
 
 Then you simply build the project and start a simple server:
 ```
-gulp browserify
-python -m SimpleHTTPServer
+npm run build
+npm run serve
 ```
-Open your browser to localhost:8000 and tada!
+Open your browser to localhost:8000 and tada! As you make changes you'll have to run npm run build again.
