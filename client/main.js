@@ -217,7 +217,6 @@ var PlayerCode = React.createClass({
     },
     render: function() {
         var lines = this.state.player.split('\n').length;
-        var fontSize = 14;
         return (
             <form>
                 <Button onClick={this.onPlayerRun}>Run</Button>
@@ -228,8 +227,9 @@ var PlayerCode = React.createClass({
                     label="RaidPlayer.js"
                     onChange={this.onPlayerUpdate}
                     value={this.state.player}
-                    fontSize={fontSize}
-                    height={lines * fontSize + 3 * fontSize}
+                    width="100%"
+                    fontSize={14}
+                    maxLines={50}
                     editorProps= {{
                         $blockScrolling: true,
                         $highlightActiveLine: true
@@ -601,10 +601,10 @@ var Raid = React.createClass({
                 {content}
 
                 <Row>
-                    <Col xs={12} md={6}>
+                    <Col xs={12} md={12} lg={7}>
                         <PlayerCode compileAndStart={this.compileAndStart}/>
                     </Col>
-                    <Col xs={12} md={6}>
+                    <Col xs={12} md={12} lg={5}>
                         <API />
                     </Col>
                 </Row>
