@@ -2,7 +2,10 @@
 
 A Rogue-like game based on the [battlecode](http://battlecode.org) API. We hope this game will be fun and help people prepare to compete in battlecode!
 
+Check out the [latest version](bovard.github.io/raid)!
+
 We're going to program this during the 2016 [7DRL](http://7drl.org/) challenge. 
+
 
 We'll do the work in two phases.
 
@@ -17,6 +20,5 @@ We'll do the work in two phases.
 2. create and balance the game concept/rules
 3. create and balance levels
 4. create leaderboard
-
 
 We believe this is in the [spirit](http://forums.roguetemple.com/index.php?topic=4885.0) of the 7DRL challenge.
