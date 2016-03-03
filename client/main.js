@@ -13,6 +13,12 @@ var Panel = require('react-bootstrap').Panel;
 var PanelGroup = require('react-bootstrap').PanelGroup;
 var Well = require('react-bootstrap').Well;
 
+// react ace
+var AceEditor = require('react-ace');
+var brace  = require('brace');
+require('brace/mode/javascript');
+require('brace/theme/chrome');
+
 
 var GameRunner = require('../lib/GameRunner');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
@@ -196,8 +202,8 @@ var samplePlayer = [
 ];
 
 var PlayerCode = React.createClass({
-    onPlayerUpdate: function() {
-        this.setState({"player": this.refs.playerText.getValue()});
+    onPlayerUpdate: function(playerCode) {
+        this.setState({"player": playerCode});
     },
     getInitialState: function() {
         return {
@@ -206,23 +212,29 @@ var PlayerCode = React.createClass({
     },
     onPlayerRun: function() {
         console.log("On player run");
-        this.props.compileAndStart(this.refs.playerText.getValue());
+        this.props.compileAndStart(this.state.player);
         return false;
     },
     render: function() {
         var lines = this.state.player.split('\n').length;
+        var fontSize = 14;
         return (
             <form>
-            <Button
-            onClick={this.onPlayerRun}
-            >Run</Button>
-            <Input
-                ref="playerText"
-                type="textarea"
-                label="RaidPlayer.js"
-                onChange={this.onPlayerUpdate}
-                rows={lines + 3}
-                value={this.state.player} />
+                <Button onClick={this.onPlayerRun}>Run</Button>
+                <AceEditor
+                    mode="javascript"
+                    theme="chrome"
+                    ref="playerText"
+                    label="RaidPlayer.js"
+                    onChange={this.onPlayerUpdate}
+                    value={this.state.player}
+                    fontSize={fontSize}
+                    height={lines * fontSize + 3 * fontSize}
+                    editorProps= {{
+                        $blockScrolling: true,
+                        $highlightActiveLine: true
+                    }}
+                />
             </form>
             )
 
