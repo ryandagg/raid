@@ -1,5 +1,5 @@
-/** @jsx React.DOM */
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 // react bootstrap
 var Accordion = require('react-bootstrap').Accordion;
@@ -21,6 +21,7 @@ var TutorialVerbage = require('../lib/TutorialVerbage');
 
 var ADVENTURE = "adventure";
 var TUTORIAL = "tutorial";
+
 
 
 var UnitStats = React.createClass({
@@ -600,7 +601,7 @@ var Raid = React.createClass({
     }
 });
 
-React.renderComponent(
+ReactDOM.render(
     <Raid />,
-    document.body
+    document.getElementById("content")
 );
