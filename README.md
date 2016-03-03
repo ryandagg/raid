@@ -38,4 +38,4 @@ Then you simply build the project and start a simple server:
 npm run build
 npm run serve
 ```
-Open your browser to localhost:8000 and tada! As you make changes you'll have to run npm run build again.
+Open your browser to localhost:8000 and tada! As you make changes you'll have to run `npm run build` again.
