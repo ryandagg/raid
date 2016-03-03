@@ -1,4 +1,3 @@
-console.log("REQUIREING REACT");
 var React = require('react');
 var ReactDOM = require('react-dom');
 
