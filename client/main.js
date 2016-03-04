@@ -23,6 +23,7 @@ require('brace/theme/chrome');
 var GameRunner = require('../lib/GameRunner');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
+var GAReporter = require('../lib/GAReporter');
 
 
 var ADVENTURE = "adventure";
@@ -487,6 +488,7 @@ var Raid = React.createClass({
     },
     startGame: function() {
         this.state.gameRunner.createNewGame(this.state.level, this.state.mode === TUTORIAL);
+        GAReporter.levelStart(this.state.mode, this.state.level);
         this.setState({"game": this.state.gameRunner.game});
         this.state.gameRunner.play();
     },
@@ -496,12 +498,14 @@ var Raid = React.createClass({
         }
         if (this.state.gameRunner.gameOver()) {
             if (this.state.gameRunner.won()) {
+                GAReporter.levelComplete(this.state.mode, this.state.level);
                 this.setState({
                     "level": this.state.level + 1,
                     "game": null,
                     "message": "Congratulations! On to the next level"
                 });
             } else {
+                GAReporter.levelGameOver(this.state.mode, this.state.level);
                 if (this.state.mode === TUTORIAL) {
                     this.setState({
                         "game": null,
@@ -521,6 +525,7 @@ var Raid = React.createClass({
         }
     },
     setGameMode: function(mode) {
+        GAReporter.startNewGame(mode);
         this.setState({"mode": mode});
     },
     setSpeed: function(speed) {
