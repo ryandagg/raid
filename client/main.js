@@ -498,14 +498,14 @@ var Raid = React.createClass({
         }
         if (this.state.gameRunner.gameOver()) {
             if (this.state.gameRunner.won()) {
-                GAReporter.levelComplete(this.state.mode, this.state.level);
+                GAReporter.levelComplete(this.state.mode, this.state.level, this.state.game.round);
                 this.setState({
                     "level": this.state.level + 1,
                     "game": null,
                     "message": "Congratulations! On to the next level"
                 });
             } else {
-                GAReporter.levelGameOver(this.state.mode, this.state.level);
+                GAReporter.levelGameOver(this.state.mode, this.state.level, this.state.game.round);
                 if (this.state.mode === TUTORIAL) {
                     this.setState({
                         "game": null,
