@@ -104,14 +104,14 @@ var TableCell = React.createClass({
             }
         }
         var style = {
-            border: "1px solid black;",
-            "background-color": color,
-            height: wid + "px;",
-            "text-align": "center;"
+            border: "1px solid black",
+            backgroundColor: color,
+            height: wid + "px",
+            textAlign: "center"
         };
         var fontStyle = {
-            "font-size": Math.ceil(.5 * wid) - 2 + "px;",
-            "font-family": 'Courier New'
+            fontSize: Math.ceil(.5 * wid) - 2 + "px",
+            fontFamily: "Courier New"
         };
         var unit = this.props.unit;
         if (unit) {
@@ -175,8 +175,8 @@ var TableRenderer = React.createClass({
             );
         }
         var style= {
-            "table-layout": "fixed;",
-            "width": "100%;"
+            tableLayout: "fixed",
+            "width": "100%"
         };
         return (
             <table style={style}>
