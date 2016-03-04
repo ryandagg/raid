@@ -453,13 +453,16 @@ var BetweenLevelContent = React.createClass({
         );
     },
     renderTutorial: function() {
+        i = 0;
         lines = TutorialVerbage(this.props.level);
-        var lines = lines.map(function (line) {return <p>{line}</p>});
         return (
             <Well>
                 <h3>Tutorial Level: {this.props.level}</h3>
                 <p><b>{this.props.message}</b></p>
-                {lines}
+                {lines.map(function(line) {
+                    i++;
+                    return <p key={i}>{line}</p>;
+                })}
                 <br />
                 <p>Press Run to Continue</p>
                 <br />
