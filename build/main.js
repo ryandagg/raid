@@ -861,14 +861,14 @@ var Raid = React.createClass({
         }
         if (this.state.gameRunner.gameOver()) {
             if (this.state.gameRunner.won()) {
-                GAReporter.levelComplete(this.state.mode, this.state.level);
+                GAReporter.levelComplete(this.state.mode, this.state.level, this.state.game.round);
                 this.setState({
                     "level": this.state.level + 1,
                     "game": null,
                     "message": "Congratulations! On to the next level"
                 });
             } else {
-                GAReporter.levelGameOver(this.state.mode, this.state.level);
+                GAReporter.levelGameOver(this.state.mode, this.state.level, this.state.game.round);
                 if (this.state.mode === TUTORIAL) {
                     this.setState({
                         "game": null,
@@ -1246,26 +1246,26 @@ function levelStart(mode, level) {
     }
 }
 
-function levelGameOver(mode, level) {
+function levelGameOver(mode, level, round) {
     if (ga) {
         ga('send', {
             hitType: 'event',
             eventCategory: 'Level',
             eventAction: 'GameOver',
             eventLabel: mode + String(level),
-            eventValue: level
+            eventValue: round
         });
     }
 }
 
-function levelComplete(mode, level) {
+function levelComplete(mode, level, round) {
     if (ga) {
         ga('send', {
             hitType: 'event',
             eventCategory: 'Level',
             eventAction: 'Complete',
             eventLabel: mode + String(level),
-            eventValue: level
+            eventValue: round
         });
     }
 }
