@@ -97,7 +97,7 @@ var TableCell = React.createClass({
         if (this.props.inSight) {
             color = "#FFFFFF";
         }
-        if (this.props.terrain === "wall") {
+        if (this.props.terrain === 1) {
             if (this.props.inSight) {
                 color = "#333333";
             } else {
@@ -105,14 +105,14 @@ var TableCell = React.createClass({
             }
         }
         var style = {
-            border: "1px solid black;",
-            "background-color": color,
-            height: wid + "px;",
-            "text-align": "center;"
+            border: "1px solid black",
+            backgroundColor: color,
+            height: wid + "px",
+            textAlign: "center"
         };
         var fontStyle = {
-            "font-size": Math.ceil(.5 * wid) - 2 + "px;",
-            "font-family": 'Courier New'
+            fontSize: Math.ceil(.5 * wid) - 2 + "px",
+            fontFamily: "Courier New"
         };
         var unit = this.props.unit;
         if (unit) {
@@ -176,8 +176,8 @@ var TableRenderer = React.createClass({
             );
         }
         var style= {
-            "table-layout": "fixed;",
-            "width": "100%;"
+            tableLayout: "fixed",
+            "width": "100%"
         };
         return (
             <table style={style}>
@@ -249,93 +249,93 @@ var API = React.createClass({
         return (
             <Well>
                 <h3>Raid API</h3>
-                <PanelGroup defaultActiveKey="0" accordion>
-                    <Panel header="PlayerController" key="1">
-                        <PanelGroup defaultActiveKey="0" accordion>
-                            <Panel header="bool canMove(Direction d)" key="1">
+                <Accordion>
+                    <Panel header="PlayerController" eventKey="1">
+                        <Accordion>
+                            <Panel header="bool canMove(Direction d)" eventKey="1">
                                 Returns true if the unit can move in Direction d and false otherwise
                             </Panel>
-                            <Panel header="move(Direction d)" key="2">
+                            <Panel header="move(Direction d)" eventKey="2">
                                 Moves the unit in direction d (adding delay). Throws an Error if that's not possible.
                             </Panel>
-                            <Panel header="bool canMeleeAttack(Direction d)" key="3">
+                            <Panel header="bool canMeleeAttack(Direction d)" eventKey="3">
                                 Returns true if the unit can attack that direction
                             </Panel>
-                            <Panel header="meleeAttack(Direction d)" key="4">
+                            <Panel header="meleeAttack(Direction d)" eventKey="4">
                                 Melee attacks in direction d
                             </Panel>
-                            <Panel header="bool canMagicAttack(MapLocation m)" key="5">
+                            <Panel header="bool canMagicAttack(MapLocation m)" eventKey="5">
                                 Returns true if the unit can attack that location
                             </Panel>
-                            <Panel header="magicAttack(MapLocation m)" key="6">
+                            <Panel header="magicAttack(MapLocation m)" eventKey="6">
                                 Magic attacks at m. Magic attacks do splash damage to nearby squares
                             </Panel>
-                            <Panel header="bool canRangedAttack(MapLocation m)" key="7">
+                            <Panel header="bool canRangedAttack(MapLocation m)" eventKey="7">
                                 Returns true if the unit can range attack that location
                             </Panel>
-                            <Panel header="rangedAttack(MapLocation m)" key="8">
+                            <Panel header="rangedAttack(MapLocation m)" eventKey="8">
                                 Range attacks at m. Ranged attack does big damage with large range but has a minimum range.
                             </Panel>
-                            <Panel header="double getDelay()" key="9">
+                            <Panel header="double getDelay()" eventKey="9">
                                 Get your player's current delay.
                             </Panel>
-                            <Panel header="MapLocation getCurrentLocation()" key="10">
+                            <Panel header="MapLocation getCurrentLocation()" eventKey="10">
                                 Get your player's current location.
                             </Panel>
-                            <Panel header="int getGameRound()" key="11">
+                            <Panel header="int getGameRound()" eventKey="11">
                                 Get the current game round.
                             </Panel>
-                            <Panel header="int getGameRoundLimit()" key="12">
+                            <Panel header="int getGameRoundLimit()" eventKey="12">
                                 Gets the game round limit.
                             </Panel>
-                            <Panel header="bool canSense(MapLocation m)" key="13">
+                            <Panel header="bool canSense(MapLocation m)" eventKey="13">
                                 Returns true if m is in this units sensor range.
                             </Panel>
-                            <Panel header="bool senseIfWall(MapLocation m)" key="14">
+                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="14">
                                 Returns true if location m is a wall.
                             </Panel>
-                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" key="15">
+                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="15">
                                 Senses the unit at that location.
                             </Panel>
-                            <Panel header="UnitInfo[] senseNearbyUnits()" key="16">
+                            <Panel header="UnitInfo[] senseNearbyUnits()" eventKey="16">
                                 Senses all units in sensorRange
                             </Panel>
-                            <Panel header="Direction senseDirectionToExit()" key="17">
+                            <Panel header="Direction senseDirectionToExit()" eventKey="17">
                                 Senses the direction to the level exit;
                             </Panel>
-                            <Panel header="MapLocation senseExitLocIfClose()" key="18">
+                            <Panel header="MapLocation senseExitLocIfClose()" eventKey="18">
                                 Senses the location of the exit if you are close enough;
                             </Panel>
 
-                        </PanelGroup>
+                        </Accordion>
                     </Panel>
-                    <Panel header="MapLocation" key="2">
+                    <Panel header="MapLocation" eventKey="2">
                         <ul>
                             <li>int x: the east/west coordinate (east (0) -> west (width))</li>
                             <li>int y: the north/south cooredinate (north (0) -> south (height))</li>
                         </ul>
-                        <PanelGroup defaultActiveKey="0" accordion>
-                            <Panel header="MapLocation add(Direction d)" key="1">
+                        <Accordion>
+                            <Panel header="MapLocation add(Direction d)" eventKey="1">
                                 Adds direction d to this location and return a new location in that direction.
                             </Panel>
-                            <Panel header="Direction directionTo(MapLocation m)" key="2">
+                            <Panel header="Direction directionTo(MapLocation m)" eventKey="2">
                                 Returns the direction to move from this current to square to get to m.
                             </Panel>
-                            <Panel header="int distanceSquaredTo(MapLocation m)" key="3">
+                            <Panel header="int distanceSquaredTo(MapLocation m)" eventKey="3">
                                 Returns the distance squared from this location to m.
                             </Panel>
-                            <Panel header="bool isAdjacentTo(MapLocation m)" key="4">
+                            <Panel header="bool isAdjacentTo(MapLocation m)" eventKey="4">
                                 Returns true if this location is adjectent to m.
                             </Panel>
-                            <Panel header="bool equals(MapLocation m)" key="5">
+                            <Panel header="bool equals(MapLocation m)" eventKey="5">
                                 Returns true if this location equals m.
                             </Panel>
-                            <Panel header="String toString()" key="6">
+                            <Panel header="String toString()" eventKey="6">
                                 Returns the string representation of this lcoation.
                             </Panel>
-                        </PanelGroup>
+                        </Accordion>
                     </Panel>
-                    <Panel header="Direction" key="3">
+                    <Panel header="Direction" eventKey="3">
                         <ul>
                             <li>int x: the east/west component (east (-1) -> west (1))</li>
                             <li>int y: the north/south component (north (-1) -> south (1))</li>
@@ -343,28 +343,28 @@ var API = React.createClass({
                             <li>Direction.OMNI - returned when you are at a location and do directionTo that same location</li>
                             <li>Direction.randomDirection() - returns a random direction (not including OMNI)</li>
                         </ul>
-                        <PanelGroup defaultActiveKey="0" accordion>
-                            <Panel header="bool equals(Direction d)" key="1">
+                        <Accordion>
+                            <Panel header="bool equals(Direction d)" eventKey="1">
                                 Returns true if this direction equals d.
                             </Panel>
-                            <Panel header="Direction rotateLeft()" key="2">
+                            <Panel header="Direction rotateLeft()" eventKey="2">
                                 Returns the direction to the left. Ie NORTH.rotateLeft() -> NORTH_WEST
                             </Panel>
-                            <Panel header="Direction rotateRight()" key="3">
+                            <Panel header="Direction rotateRight()" eventKey="3">
                                 Returns the direction to the right. Ie NORTH.rotateRight() -> NORTH_EAST
                             </Panel>
-                            <Panel header="Direction opposite()" key="4">
+                            <Panel header="Direction opposite()" eventKey="4">
                                 Returns the opposite direction. Ie NORTH.opposite() -> SOUTH
                             </Panel>
-                            <Panel header="bool isDiagonal()" key="5">
+                            <Panel header="bool isDiagonal()" eventKey="5">
                                 Returns true if this direction is not cardinal
                             </Panel>
-                            <Panel header="String toString()" key="6">
+                            <Panel header="String toString()" eventKey="6">
                                 Returns the string representation of this direction
                             </Panel>
-                        </PanelGroup>
+                        </Accordion>
                     </Panel>
-                    <Panel header="GameConstants" key="4">
+                    <Panel header="GameConstants" eventKey="4">
                         (access through GameContants.VAR_NAME)
                         <ul>
                             <li>MIN_RANGED_ATTACK_RADIUS_SQUARED: 16,</li>
@@ -382,7 +382,7 @@ var API = React.createClass({
                             <li>PLAYER_RANGED_DELAY: 3</li>
                         </ul>
                     </Panel>
-                    <Panel header="UnitInfo" key="5">
+                    <Panel header="UnitInfo" eventKey="5">
                         (note values are static / don't update unless you sense again)
                         <ul>
                             <li>name - the name of the unit</li>
@@ -405,7 +405,7 @@ var API = React.createClass({
                             <li>spawnedUnitType - what type of unit will be spawned</li>
                         </ul>
                     </Panel>
-                </PanelGroup>
+                </Accordion>
             </Well>
         );
     }
@@ -454,13 +454,16 @@ var BetweenLevelContent = React.createClass({
         );
     },
     renderTutorial: function() {
+        i = 0;
         lines = TutorialVerbage(this.props.level);
-        var lines = lines.map(function (line) {return <p>{line}</p>});
         return (
             <Well>
                 <h3>Tutorial Level: {this.props.level}</h3>
                 <p><b>{this.props.message}</b></p>
-                {lines}
+                {lines.map(function(line) {
+                    i++;
+                    return <p key={i}>{line}</p>;
+                })}
                 <br />
                 <p>Press Run to Continue</p>
                 <br />
