@@ -169,7 +169,7 @@ var TableRenderer = React.createClass({
             "width": "100%"
         };
         return (
-            <table style={style}>
+            <table id="map" style={style}>
                 <thead></thead>
                 <tbody>{rows}</tbody>
             </table>
