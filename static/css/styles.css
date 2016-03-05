@@ -1,5 +1,41 @@
-textarea
-{
-   font-family: "Courier New", Courier, monospace;
-   font-size: 12px;
+.tile {
+    border: 1px solid #000000;
+    text-align: center;
+    font-family: "Courier New", sans-serif;
+}
+
+.in-sight {
+    opacity: 0.9;
+}
+
+.grass {
+    background-color: #2b542c;
+}
+
+.dirt {
+    background-color: rgba(137, 82, 30, 0.7);
+}
+
+.sand {
+    background-color: rgba(255, 253, 0, 0.3);
+}
+
+.cement {
+    background-color: rgba(0, 0, 0, 0.46);
+}
+
+.tree {
+    background-color: #603600;
+}
+
+.wall {
+    background-color: #222222;
+}
+
+.water {
+    background-color: #0005ff;
+}
+
+.rock {
+    background-color: rgba(0, 0, 0, 0.54);
 }
