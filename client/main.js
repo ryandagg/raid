@@ -513,6 +513,7 @@ var Raid = React.createClass({
                     "message": "Congratulations! On to the next level"
                 });
             } else {
+                this.state.gameRunner.scoreManager.reset();
                 GAReporter.levelGameOver(this.state.mode, this.state.level, this.state.game.round);
                 if (this.state.mode === TUTORIAL) {
                     this.setState({
