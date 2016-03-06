@@ -10,7 +10,7 @@
 }
 
 .in-sight {
-    opacity: 0.9;
+    background-color: rgba(255, 255, 255, 0.15)
 }
 
 .grass {
@@ -36,6 +36,7 @@
 .tree {
     /* http://opengameart.org/node/10054 */
     background: url(../images/textures/tree.png) center center fixed;
+    border-radius: 100%;
 }
 
 .wall {
@@ -51,4 +52,5 @@
 .rock {
     /* http://opengameart.org/node/8062 */
     background: url(../images/textures/rock.png) center center fixed;
+    border-radius: 100%;
 }
