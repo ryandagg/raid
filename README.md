@@ -29,6 +29,7 @@ We believe this is in the [spirit](http://forums.roguetemple.com/index.php?topic
 Make sure you have node and npm installed.
 
 ```
+npm install -g browserify
 cd raid/
 npm install
 ```
@@ -39,3 +40,13 @@ npm run build
 npm run serve
 ```
 Open your browser to localhost:8000 and tada! As you make changes you'll have to run `npm run build` again.
+
+### Problems:
+
+```
+Error: EMFILE, open '/.../node_modules/react-bootstrap/package.json'
+```
+Your file limit it too low for browserify, fix it with:
+```
+ulimit -n 2560
+```
