@@ -193,7 +193,7 @@ var samplePlayer = [
     "        this.pc.move(Direction.SOUTH);",
     "      }",
     "   }",
-    "};",
+    "};"
 ];
 
 var PlayerCode = React.createClass({
@@ -210,7 +210,6 @@ var PlayerCode = React.createClass({
         return false;
     },
     render: function() {
-        var lines = this.state.player.split('\n').length;
         return (
             <form>
                 <Button onClick={this.onPlayerRun}>Run</Button>
@@ -250,6 +249,12 @@ var API = React.createClass({
                             </Panel>
                             <Panel header="move(Direction d)" eventKey="2">
                                 Moves the unit in direction d (adding delay). Throws an Error if that's not possible.
+                            </Panel>
+                            <Panel header="bool canHeal()" eventKey="19">
+                                Returns true if the unit can heal
+                            </Panel>
+                            <Panel header="heal()" eventKey="20">
+                                Heals the unit
                             </Panel>
                             <Panel header="bool canMeleeAttack(Direction d)" eventKey="3">
                                 Returns true if the unit can attack that direction
@@ -367,6 +372,8 @@ var API = React.createClass({
                             <li>MAX_MELEE_ATTACK_RADIUS_SQUARED: 2,</li>
                             <li>SENSE_EXIT_THRESHOLD: 144,</li>
                             <li>PLAYER_MOVE_DELAY: 2,</li>
+                            <li>PLAYER_HEAL_POWER: 5,</li>
+                            <li>PLAYER_HEAL_DELAY: 20,</li>
                             <li>PLAYER_MELEE_POWER: 6,</li>
                             <li>PLAYER_MELEE_DELAY: 2,</li>
                             <li>PLAYER_MAGIC_POWER: 4,</li>
@@ -382,9 +389,12 @@ var API = React.createClass({
                             <li>type - the symbol of the unit</li>
                             <li>hp - the current hp of the unit</li>
                             <li>maxHp - the maxHp of that unit</li>
+                            <li>canBeHealed - indicates if the unit can be healed</li>
                             <li>location - the maplocation of the unit when you sensed it</li>
                             <li>delay - the current delay of the unit (can't act until delay less than 1)</li>
                             <li>movementDelay - the delay incurred by movement</li>
+                            <li>healPower - how much HP the unit can heal</li>
+                            <li>healDelay - how much delay is incurred by healing (0 if can't heal)</li>
                             <li>meleeAttackPower - how much damage a melee attack does</li>
                             <li>meleeAttackDelay - how much delay is incurred by melee attack (0 if can't attack)</li>
                             <li>magicAttackPower - how much damage a magic attack does</li>
