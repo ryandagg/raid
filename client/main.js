@@ -92,30 +92,22 @@ var GameStats = React.createClass({
 
 var TableCell = React.createClass({
     render: function() {
+        var classes = "tile"
+        if (this.props.terrain.cssClass != this.props.mapCssClass) {
+            classes += " " + this.props.terrain.cssClass;
+        }
         var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         var wid = (.8*w)/this.props.width;
 
-        var color = "#AAAAAA";
         if (this.props.inSight) {
-            color = "#FFFFFF";
-        }
-        if (this.props.terrain === 1) {
-            if (this.props.inSight) {
-                color = "#333333";
-            } else {
-                color = "#000000";
-            }
+            classes += ' in-sight';
         }
         var style = {
-            border: "1px solid black",
-            backgroundColor: color,
-            height: wid + "px",
-            textAlign: "center"
+            height: wid + "px"
         };
         var fontStyle = {
-            fontSize: Math.ceil(.5 * wid) - 2 + "px",
-            fontFamily: "Courier New"
+            fontSize: Math.ceil(.5 * wid) - 2 + "px"
         };
         var unit = this.props.unit;
         if (unit) {
@@ -125,7 +117,7 @@ var TableCell = React.createClass({
             unit = "/"
         }
         return (
-            <td style={style}>
+            <td className={classes} style={style}>
                 <p style={fontStyle}>
                     {unit}
                 </p>
@@ -149,6 +141,7 @@ var TableRow = React.createClass({
                     terrain={this.props.terrain[i]}
                     unit={this.props.units[i]}
                     inSight={inSight}
+                    mapCssClass={this.props.mapCssClass}
                 />
             )
         }
@@ -175,6 +168,7 @@ var TableRenderer = React.createClass({
                         units={this.props.units[i]}
                         terrain={this.props.terrain[i]}
                         playerLoc={this.props.playerLoc}
+                        mapCssClass={this.props.cssClass}
                       />
             );
         }
@@ -183,7 +177,7 @@ var TableRenderer = React.createClass({
             "width": "100%"
         };
         return (
-            <table style={style}>
+            <table id="map" className={this.props.cssClass} style={style}>
                 <thead></thead>
                 <tbody>{rows}</tbody>
             </table>
@@ -226,7 +220,6 @@ var PlayerCode = React.createClass({
         }
     },
     onPlayerRun: function() {
-        console.log("On player run");
         this.props.compileAndStart(this.state.player);
         return false;
     },
@@ -607,6 +600,7 @@ var Raid = React.createClass({
                             exit={this.state.game.map.exit}
                             gameId={this.state.game.id}
                             terrain={this.state.game.map.terrain}
+                            cssClass={this.state.game.map.cssClass}
                             units={this.state.game.map.units}
                             playerLoc={this.state.game.player.location}
                             />
