@@ -31,6 +31,7 @@
     "react-dom": "^0.14.7",
     "brace": "^0.7.0",
     "react-ace": "^3.1.0",
-    "pathfinding": "^0.4.17"
+    "pathfinding": "^0.4.17",
+    "clone": "^1.0.2"
   }
 }
