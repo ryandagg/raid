@@ -509,14 +509,14 @@ var Raid = React.createClass({
         var canvas = document.createElement('canvas');
         canvas.width = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_WIDTH;
         canvas.height = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_HEIGHT;
-        canvas.style = "width: 100%; height: 100%;";
+        canvas.style = "width: 100%;";
         return {
             "gameRunner": gR,
             "game": null,
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "canvas", // options: "canvas" or "table"
+            "renderer": "table", // options: "canvas" or "table"
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas)
         }
