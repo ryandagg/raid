@@ -21,6 +21,7 @@ require('brace/theme/chrome');
 
 
 var GameRunner = require('../lib/GameRunner');
+var ScoreEvent = require('../lib/ScoreEvent');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
 var GAReporter = require('../lib/GAReporter');
@@ -40,6 +41,7 @@ var UnitStats = React.createClass({
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
+                <p>Score: {this.props.score}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
                 <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
@@ -494,6 +496,7 @@ var Raid = React.createClass({
         }
         if (this.state.gameRunner.gameOver()) {
             if (this.state.gameRunner.won()) {
+                this.state.gameRunner.updateScore({event: ScoreEvent.MAP_CLEARED, state: this.state});
                 GAReporter.levelComplete(this.state.mode, this.state.level, this.state.game.round);
                 this.setState({
                     "level": this.state.level + 1,
@@ -578,7 +581,7 @@ var Raid = React.createClass({
                     <Col xs={12} md={3}>
                         <Row>
                             <Col xs={4} md={12}>
-                                <UnitStats unit={this.state.game.player} />
+                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
                             </Col>
                             <Col xs={4} md={12}>
                                 <UnitStats unit={closestUnit} />
