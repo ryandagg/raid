@@ -21,6 +21,7 @@ require('brace/theme/chrome');
 
 
 var GameRunner = require('../lib/GameRunner');
+var ScoreEvent = require('../lib/ScoreEvent');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
 var GAReporter = require('../lib/GAReporter');
@@ -33,13 +34,23 @@ var TUTORIAL = "tutorial";
 
 var UnitStats = React.createClass({
     render: function() {
+        var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
             return (<p>No units in range</p>);
+        }
+        if (this.props.unit.defeatPoints) {
+            scoreOrPointsLabel = "Value";
+            scoreOrPointsValue = this.props.unit.defeatPoints;
+        }
+        else {
+            scoreOrPointsLabel = "Score";
+            scoreOrPointsValue = this.props.score;
         }
         return (
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
+                <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
                 <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
@@ -449,6 +460,7 @@ var BetweenLevelContent = React.createClass({
         return (
             <Well>
                 <h3>Adventure Level: {this.props.level}</h3>
+                <p>Score: {this.props.score}</p>
                 <p>{this.props.message}</p>
                 <br />
                 <p>Press Run to Continue</p>
@@ -462,6 +474,7 @@ var BetweenLevelContent = React.createClass({
         return (
             <Well>
                 <h3>Tutorial Level: {this.props.level}</h3>
+                <h4>Score: {this.props.score}</h4>
                 <p><b>{this.props.message}</b></p>
                 {lines.map(function(line) {
                     i++;
@@ -504,6 +517,7 @@ var Raid = React.createClass({
         }
         if (this.state.gameRunner.gameOver()) {
             if (this.state.gameRunner.won()) {
+                this.state.gameRunner.updateScore({event: ScoreEvent.MAP_CLEARED, state: this.state});
                 GAReporter.levelComplete(this.state.mode, this.state.level, this.state.game.round);
                 this.setState({
                     "level": this.state.level + 1,
@@ -511,6 +525,8 @@ var Raid = React.createClass({
                     "message": "Congratulations! On to the next level"
                 });
             } else {
+                this.setState({"finalScore": this.state.gameRunner.scoreManager.getScore()});
+                this.state.gameRunner.scoreManager.reset();
                 GAReporter.levelGameOver(this.state.mode, this.state.level, this.state.game.round);
                 if (this.state.mode === TUTORIAL) {
                     this.setState({
@@ -554,11 +570,13 @@ var Raid = React.createClass({
         this.state.gameRunner.step();
     },
     renderGame: function() {
+        var score = this.state.finalScore || this.state.gameRunner.scoreManager.getScore();
         var content = (
             <BetweenLevelContent
                 level={this.state.level}
                 mode={this.state.mode}
                 message={this.state.message}
+                score={score}
             />);
         if (this.state.game) {
             var nearbyUnits = this.state.game.player.player.pc.senseNearbyUnits();
@@ -588,7 +606,7 @@ var Raid = React.createClass({
                     <Col xs={12} md={3}>
                         <Row>
                             <Col xs={4} md={12}>
-                                <UnitStats unit={this.state.game.player} />
+                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
                             </Col>
                             <Col xs={4} md={12}>
                                 <UnitStats unit={closestUnit} />
