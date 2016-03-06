@@ -26,6 +26,9 @@ var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
 var GAReporter = require('../lib/GAReporter');
 
+// Graphics
+var GraphicsConstants = require('../lib/Graphics/GraphicsConstants');
+var GameRenderer = require('../lib/Graphics/GameRenderer');
 
 var ADVENTURE = "adventure";
 var TUTORIAL = "tutorial";
@@ -189,6 +192,17 @@ var TableRenderer = React.createClass({
                 <thead></thead>
                 <tbody>{rows}</tbody>
             </table>
+            );
+    }
+});
+
+var CanvasRenderer = React.createClass({
+    componentDidMount: function () {
+        ReactDOM.findDOMNode(this).appendChild(this.props.canvas);
+    },
+    render: function() {
+        return (
+            <div />
             );
     }
 });
@@ -492,12 +506,19 @@ var BetweenLevelContent = React.createClass({
 var Raid = React.createClass({
     getInitialState: function() {
         var gR = new GameRunner(this.updateGame);
+        var canvas = document.createElement('canvas');
+        canvas.width = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_WIDTH;
+        canvas.height = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_HEIGHT;
+        canvas.style = "width: 100%;";
         return {
             "gameRunner": gR,
             "game": null,
             "mode": null,
             "level": 1,
-            "message": "Welcome!"
+            "message": "Welcome!",
+            "renderer": "table", // options: "canvas" or "table"
+            "canvas": canvas,
+            "gameRenderer": new GameRenderer(canvas)
         }
     },
     compileAndStart: function(playerCode) {
@@ -545,6 +566,10 @@ var Raid = React.createClass({
         } else {
             this.setState({"game": game});
         }
+        // Render updated game state to canvas
+        if(this.state.renderer == "canvas"){
+            this.state.gameRenderer.render(game);
+        }
     },
     setGameMode: function(mode) {
         GAReporter.startNewGame(mode);
@@ -589,9 +614,14 @@ var Raid = React.createClass({
                     closetUnitDistSq = d;
                 }
             }
-            content = (
-                <Row>
-                    <Col xs={12} md={9}>
+            // Setup renderer
+            var renderer = null;
+            if(this.state.renderer == "canvas"){
+                renderer = (
+                        <CanvasRenderer canvas={this.state.canvas} />
+                    );
+            }else{
+                renderer = (
                         <TableRenderer
                             width={this.state.game.map.width}
                             height={this.state.game.map.height}
@@ -602,6 +632,12 @@ var Raid = React.createClass({
                             units={this.state.game.map.units}
                             playerLoc={this.state.game.player.location}
                             />
+                    );
+            }
+            content = (
+                <Row>
+                    <Col xs={12} md={9}>
+                        {renderer}
                     </Col>
                     <Col xs={12} md={3}>
                         <Row>
