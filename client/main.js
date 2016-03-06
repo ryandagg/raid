@@ -34,14 +34,23 @@ var TUTORIAL = "tutorial";
 
 var UnitStats = React.createClass({
     render: function() {
+        var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
             return (<p>No units in range</p>);
+        }
+        if (this.props.unit.defeatPoints) {
+            scoreOrPointsLabel = "Value";
+            scoreOrPointsValue = this.props.unit.defeatPoints;
+        }
+        else {
+            scoreOrPointsLabel = "Score";
+            scoreOrPointsValue = this.props.score;
         }
         return (
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
-                <p>Score: {this.props.score}</p>
+                <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
                 <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
