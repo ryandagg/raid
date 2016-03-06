@@ -450,6 +450,7 @@ var BetweenLevelContent = React.createClass({
         return (
             <Well>
                 <h3>Adventure Level: {this.props.level}</h3>
+                <p>Score: {this.props.score}</p>
                 <p>{this.props.message}</p>
                 <br />
                 <p>Press Run to Continue</p>
@@ -463,6 +464,7 @@ var BetweenLevelContent = React.createClass({
         return (
             <Well>
                 <h3>Tutorial Level: {this.props.level}</h3>
+                <h4>Score: {this.props.score}</h4>
                 <p><b>{this.props.message}</b></p>
                 {lines.map(function(line) {
                     i++;
@@ -513,6 +515,7 @@ var Raid = React.createClass({
                     "message": "Congratulations! On to the next level"
                 });
             } else {
+                this.setState({"finalScore": this.state.gameRunner.scoreManager.getScore()});
                 this.state.gameRunner.scoreManager.reset();
                 GAReporter.levelGameOver(this.state.mode, this.state.level, this.state.game.round);
                 if (this.state.mode === TUTORIAL) {
@@ -557,11 +560,13 @@ var Raid = React.createClass({
         this.state.gameRunner.step();
     },
     renderGame: function() {
+        var score = this.state.finalScore || this.state.gameRunner.scoreManager.getScore();
         var content = (
             <BetweenLevelContent
                 level={this.state.level}
                 mode={this.state.mode}
                 message={this.state.message}
+                score={score}
             />);
         if (this.state.game) {
             var nearbyUnits = this.state.game.player.player.pc.senseNearbyUnits();
