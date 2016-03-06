@@ -486,7 +486,7 @@ var Raid = React.createClass({
         var canvas = document.createElement('canvas');
         canvas.width = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_WIDTH;
         canvas.height = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_HEIGHT;
-        canvas.style = "width: 100%; height: 100%;";
+        canvas.style = "width: 100%;";
         return {
             "gameRunner": gR,
             "game": null,
