@@ -1,5 +1,56 @@
-textarea
-{
-   font-family: "Courier New", Courier, monospace;
-   font-size: 12px;
+#map {
+    font-weight: bold;
+    color: #000000;
+}
+
+.tile {
+    /* border: 1px solid #000000; */
+    text-align: center;
+    font-family: "Courier New", sans-serif;
+}
+
+.in-sight {
+    background-color: rgba(255, 255, 255, 0.15)
+}
+
+.grass {
+    /* http://opengameart.org/node/7539 */
+    background: url(../images/textures/grass.png) center center fixed;
+}
+
+.dirt {
+    /* http://opengameart.org/node/7404 */
+    background: url(../images/textures/dirt.png) center center fixed;
+}
+
+.sand {
+    /* http://opengameart.org/node/10570 */
+    background: url(../images/textures/sand.png) center center fixed;
+}
+
+.cement {
+    /* http://opengameart.org/node/6989 */
+    background: url(../images/textures/cement.png) center center fixed;
+}
+
+.tree {
+    /* http://opengameart.org/node/10054 */
+    background: url(../images/textures/tree.png) center center fixed;
+    border-radius: 100%;
+}
+
+.wall {
+    /* http://opengameart.org/node/48263 */
+    background: url(../images/textures/wall.png) center center fixed;
+}
+
+.water {
+    /* http://opengameart.org/node/10510 */
+    background: url(../images/textures/water.png) center center fixed;
+}
+
+.rock {
+    /* http://opengameart.org/node/8062 */
+    background: url(../images/textures/rock.png) center center fixed;
+    border-radius: 100%;
 }

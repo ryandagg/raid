@@ -21,6 +21,7 @@ require('brace/theme/chrome');
 
 
 var GameRunner = require('../lib/GameRunner');
+var ScoreEvent = require('../lib/ScoreEvent');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
 var GAReporter = require('../lib/GAReporter');
@@ -33,13 +34,23 @@ var TUTORIAL = "tutorial";
 
 var UnitStats = React.createClass({
     render: function() {
+        var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
             return (<p>No units in range</p>);
+        }
+        if (this.props.unit.defeatPoints) {
+            scoreOrPointsLabel = "Value";
+            scoreOrPointsValue = this.props.unit.defeatPoints;
+        }
+        else {
+            scoreOrPointsLabel = "Score";
+            scoreOrPointsValue = this.props.score;
         }
         return (
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
+                <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
                 <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
@@ -89,30 +100,22 @@ var GameStats = React.createClass({
 
 var TableCell = React.createClass({
     render: function() {
+        var classes = "tile"
+        if (this.props.terrain.cssClass != this.props.mapCssClass) {
+            classes += " " + this.props.terrain.cssClass;
+        }
         var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         var wid = (.8*w)/this.props.width;
 
-        var color = "#AAAAAA";
         if (this.props.inSight) {
-            color = "#FFFFFF";
-        }
-        if (this.props.terrain === 1) {
-            if (this.props.inSight) {
-                color = "#333333";
-            } else {
-                color = "#000000";
-            }
+            classes += ' in-sight';
         }
         var style = {
-            border: "1px solid black",
-            backgroundColor: color,
-            height: wid + "px",
-            textAlign: "center"
+            height: wid + "px"
         };
         var fontStyle = {
-            fontSize: Math.ceil(.5 * wid) - 2 + "px",
-            fontFamily: "Courier New"
+            fontSize: Math.ceil(.5 * wid) - 2 + "px"
         };
         var unit = this.props.unit;
         if (unit) {
@@ -122,7 +125,7 @@ var TableCell = React.createClass({
             unit = "/"
         }
         return (
-            <td style={style}>
+            <td className={classes} style={style}>
                 <p style={fontStyle}>
                     {unit}
                 </p>
@@ -146,6 +149,7 @@ var TableRow = React.createClass({
                     terrain={this.props.terrain[i]}
                     unit={this.props.units[i]}
                     inSight={inSight}
+                    mapCssClass={this.props.mapCssClass}
                 />
             )
         }
@@ -172,6 +176,7 @@ var TableRenderer = React.createClass({
                         units={this.props.units[i]}
                         terrain={this.props.terrain[i]}
                         playerLoc={this.props.playerLoc}
+                        mapCssClass={this.props.cssClass}
                       />
             );
         }
@@ -180,7 +185,7 @@ var TableRenderer = React.createClass({
             "width": "100%"
         };
         return (
-            <table style={style}>
+            <table id="map" className={this.props.cssClass} style={style}>
                 <thead></thead>
                 <tbody>{rows}</tbody>
             </table>
@@ -199,7 +204,7 @@ var samplePlayer = [
     "        this.pc.move(Direction.SOUTH);",
     "      }",
     "   }",
-    "};",
+    "};"
 ];
 
 var PlayerCode = React.createClass({
@@ -212,12 +217,10 @@ var PlayerCode = React.createClass({
         }
     },
     onPlayerRun: function() {
-        console.log("On player run");
         this.props.compileAndStart(this.state.player);
         return false;
     },
     render: function() {
-        var lines = this.state.player.split('\n').length;
         return (
             <form>
                 <Button onClick={this.onPlayerRun}>Run</Button>
@@ -257,6 +260,12 @@ var API = React.createClass({
                             </Panel>
                             <Panel header="move(Direction d)" eventKey="2">
                                 Moves the unit in direction d (adding delay). Throws an Error if that's not possible.
+                            </Panel>
+                            <Panel header="bool canHeal()" eventKey="19">
+                                Returns true if the unit can heal
+                            </Panel>
+                            <Panel header="heal()" eventKey="20">
+                                Heals the unit
                             </Panel>
                             <Panel header="bool canMeleeAttack(Direction d)" eventKey="3">
                                 Returns true if the unit can attack that direction
@@ -374,6 +383,8 @@ var API = React.createClass({
                             <li>MAX_MELEE_ATTACK_RADIUS_SQUARED: 2,</li>
                             <li>SENSE_EXIT_THRESHOLD: 144,</li>
                             <li>PLAYER_MOVE_DELAY: 2,</li>
+                            <li>PLAYER_HEAL_POWER: 5,</li>
+                            <li>PLAYER_HEAL_DELAY: 20,</li>
                             <li>PLAYER_MELEE_POWER: 6,</li>
                             <li>PLAYER_MELEE_DELAY: 2,</li>
                             <li>PLAYER_MAGIC_POWER: 4,</li>
@@ -389,9 +400,12 @@ var API = React.createClass({
                             <li>type - the symbol of the unit</li>
                             <li>hp - the current hp of the unit</li>
                             <li>maxHp - the maxHp of that unit</li>
+                            <li>canBeHealed - indicates if the unit can be healed</li>
                             <li>location - the maplocation of the unit when you sensed it</li>
                             <li>delay - the current delay of the unit (can't act until delay less than 1)</li>
                             <li>movementDelay - the delay incurred by movement</li>
+                            <li>healPower - how much HP the unit can heal</li>
+                            <li>healDelay - how much delay is incurred by healing (0 if can't heal)</li>
                             <li>meleeAttackPower - how much damage a melee attack does</li>
                             <li>meleeAttackDelay - how much delay is incurred by melee attack (0 if can't attack)</li>
                             <li>magicAttackPower - how much damage a magic attack does</li>
@@ -446,6 +460,7 @@ var BetweenLevelContent = React.createClass({
         return (
             <Well>
                 <h3>Adventure Level: {this.props.level}</h3>
+                <p>Score: {this.props.score}</p>
                 <p>{this.props.message}</p>
                 <br />
                 <p>Press Run to Continue</p>
@@ -459,6 +474,7 @@ var BetweenLevelContent = React.createClass({
         return (
             <Well>
                 <h3>Tutorial Level: {this.props.level}</h3>
+                <h4>Score: {this.props.score}</h4>
                 <p><b>{this.props.message}</b></p>
                 {lines.map(function(line) {
                     i++;
@@ -501,6 +517,7 @@ var Raid = React.createClass({
         }
         if (this.state.gameRunner.gameOver()) {
             if (this.state.gameRunner.won()) {
+                this.state.gameRunner.updateScore({event: ScoreEvent.MAP_CLEARED, state: this.state});
                 GAReporter.levelComplete(this.state.mode, this.state.level, this.state.game.round);
                 this.setState({
                     "level": this.state.level + 1,
@@ -508,6 +525,8 @@ var Raid = React.createClass({
                     "message": "Congratulations! On to the next level"
                 });
             } else {
+                this.setState({"finalScore": this.state.gameRunner.scoreManager.getScore()});
+                this.state.gameRunner.scoreManager.reset();
                 GAReporter.levelGameOver(this.state.mode, this.state.level, this.state.game.round);
                 if (this.state.mode === TUTORIAL) {
                     this.setState({
@@ -551,11 +570,13 @@ var Raid = React.createClass({
         this.state.gameRunner.step();
     },
     renderGame: function() {
+        var score = this.state.finalScore || this.state.gameRunner.scoreManager.getScore();
         var content = (
             <BetweenLevelContent
                 level={this.state.level}
                 mode={this.state.mode}
                 message={this.state.message}
+                score={score}
             />);
         if (this.state.game) {
             var nearbyUnits = this.state.game.player.player.pc.senseNearbyUnits();
@@ -577,6 +598,7 @@ var Raid = React.createClass({
                             exit={this.state.game.map.exit}
                             gameId={this.state.game.id}
                             terrain={this.state.game.map.terrain}
+                            cssClass={this.state.game.map.cssClass}
                             units={this.state.game.map.units}
                             playerLoc={this.state.game.player.location}
                             />
@@ -584,7 +606,7 @@ var Raid = React.createClass({
                     <Col xs={12} md={3}>
                         <Row>
                             <Col xs={4} md={12}>
-                                <UnitStats unit={this.state.game.player} />
+                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
                             </Col>
                             <Col xs={4} md={12}>
                                 <UnitStats unit={closestUnit} />
