@@ -21,10 +21,14 @@ require('brace/theme/chrome');
 
 
 var GameRunner = require('../lib/GameRunner');
+var ScoreEvent = require('../lib/ScoreEvent');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
 var GAReporter = require('../lib/GAReporter');
 
+// Graphics
+var GraphicsConstants = require('../lib/Graphics/GraphicsConstants');
+var GameRenderer = require('../lib/Graphics/GameRenderer');
 
 var ADVENTURE = "adventure";
 var TUTORIAL = "tutorial";
@@ -33,13 +37,23 @@ var TUTORIAL = "tutorial";
 
 var UnitStats = React.createClass({
     render: function() {
+        var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
             return (<p>No units in range</p>);
+        }
+        if (this.props.unit.defeatPoints) {
+            scoreOrPointsLabel = "Value";
+            scoreOrPointsValue = this.props.unit.defeatPoints;
+        }
+        else {
+            scoreOrPointsLabel = "Score";
+            scoreOrPointsValue = this.props.score;
         }
         return (
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
+                <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
                 <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
@@ -182,6 +196,17 @@ var TableRenderer = React.createClass({
     }
 });
 
+var CanvasRenderer = React.createClass({
+    componentDidMount: function () {
+        ReactDOM.findDOMNode(this).appendChild(this.props.canvas);
+    },
+    render: function() {
+        return (
+            <div style={{marginBottom: 30 + 'px'}} />
+            );
+    }
+});
+
 var samplePlayer = [
     "function RaidPlayer(playerController) {",
     "   this.pc = playerController;",
@@ -193,7 +218,7 @@ var samplePlayer = [
     "        this.pc.move(Direction.SOUTH);",
     "      }",
     "   }",
-    "};",
+    "};"
 ];
 
 var PlayerCode = React.createClass({
@@ -210,7 +235,6 @@ var PlayerCode = React.createClass({
         return false;
     },
     render: function() {
-        var lines = this.state.player.split('\n').length;
         return (
             <form>
                 <Button onClick={this.onPlayerRun}>Run</Button>
@@ -250,6 +274,12 @@ var API = React.createClass({
                             </Panel>
                             <Panel header="move(Direction d)" eventKey="2">
                                 Moves the unit in direction d (adding delay). Throws an Error if that's not possible.
+                            </Panel>
+                            <Panel header="bool canHeal()" eventKey="19">
+                                Returns true if the unit can heal
+                            </Panel>
+                            <Panel header="heal()" eventKey="20">
+                                Heals the unit
                             </Panel>
                             <Panel header="bool canMeleeAttack(Direction d)" eventKey="3">
                                 Returns true if the unit can attack that direction
@@ -367,6 +397,8 @@ var API = React.createClass({
                             <li>MAX_MELEE_ATTACK_RADIUS_SQUARED: 2,</li>
                             <li>SENSE_EXIT_THRESHOLD: 144,</li>
                             <li>PLAYER_MOVE_DELAY: 2,</li>
+                            <li>PLAYER_HEAL_POWER: 5,</li>
+                            <li>PLAYER_HEAL_DELAY: 20,</li>
                             <li>PLAYER_MELEE_POWER: 6,</li>
                             <li>PLAYER_MELEE_DELAY: 2,</li>
                             <li>PLAYER_MAGIC_POWER: 4,</li>
@@ -382,9 +414,12 @@ var API = React.createClass({
                             <li>type - the symbol of the unit</li>
                             <li>hp - the current hp of the unit</li>
                             <li>maxHp - the maxHp of that unit</li>
+                            <li>canBeHealed - indicates if the unit can be healed</li>
                             <li>location - the maplocation of the unit when you sensed it</li>
                             <li>delay - the current delay of the unit (can't act until delay less than 1)</li>
                             <li>movementDelay - the delay incurred by movement</li>
+                            <li>healPower - how much HP the unit can heal</li>
+                            <li>healDelay - how much delay is incurred by healing (0 if can't heal)</li>
                             <li>meleeAttackPower - how much damage a melee attack does</li>
                             <li>meleeAttackDelay - how much delay is incurred by melee attack (0 if can't attack)</li>
                             <li>magicAttackPower - how much damage a magic attack does</li>
@@ -439,6 +474,7 @@ var BetweenLevelContent = React.createClass({
         return (
             <Well>
                 <h3>Adventure Level: {this.props.level}</h3>
+                <p>Score: {this.props.score}</p>
                 <p>{this.props.message}</p>
                 <br />
                 <p>Press Run to Continue</p>
@@ -447,11 +483,12 @@ var BetweenLevelContent = React.createClass({
         );
     },
     renderTutorial: function() {
-        i = 0;
+        var i = 0;
         lines = TutorialVerbage(this.props.level);
         return (
             <Well>
                 <h3>Tutorial Level: {this.props.level}</h3>
+                <h4>Score: {this.props.score}</h4>
                 <p><b>{this.props.message}</b></p>
                 {lines.map(function(line) {
                     i++;
@@ -469,18 +506,36 @@ var BetweenLevelContent = React.createClass({
 var Raid = React.createClass({
     getInitialState: function() {
         var gR = new GameRunner(this.updateGame);
+        var canvas = document.createElement('canvas');
+        var canvasWidth = this.getCanvasWidth();
+        canvas.width = canvasWidth;
+        canvas.height = canvasWidth * GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT /  GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
         return {
             "gameRunner": gR,
             "game": null,
             "mode": null,
             "level": 1,
-            "message": "Welcome!"
+            "message": "Welcome!",
+            "renderer": "table", // options: "canvas" or "table"
+            "canvas": canvas,
+            "gameRenderer": new GameRenderer(canvas)
         }
     },
     compileAndStart: function(playerCode) {
         var playerCreator = CompilePlayerCode(playerCode);
         this.state.gameRunner.setPlayerCreator(playerCreator);
         this.startGame();
+    },
+    getCanvasWidth: function() {
+        var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        w = Math.min(1107, w);
+        var canvasWidth = w;
+        if (w > 1000) {
+            canvasWidth = .75 * .9 * w;
+        } else {
+            canvasWidth *= .85;
+        }
+        return canvasWidth;
     },
     startGame: function() {
         this.state.gameRunner.createNewGame(this.state.level, this.state.mode === TUTORIAL);
@@ -494,6 +549,7 @@ var Raid = React.createClass({
         }
         if (this.state.gameRunner.gameOver()) {
             if (this.state.gameRunner.won()) {
+                this.state.gameRunner.updateScore({event: ScoreEvent.MAP_CLEARED, state: this.state});
                 GAReporter.levelComplete(this.state.mode, this.state.level, this.state.game.round);
                 this.setState({
                     "level": this.state.level + 1,
@@ -501,6 +557,8 @@ var Raid = React.createClass({
                     "message": "Congratulations! On to the next level"
                 });
             } else {
+                this.setState({"finalScore": this.state.gameRunner.scoreManager.getScore()});
+                this.state.gameRunner.scoreManager.reset();
                 GAReporter.levelGameOver(this.state.mode, this.state.level, this.state.game.round);
                 if (this.state.mode === TUTORIAL) {
                     this.setState({
@@ -518,6 +576,10 @@ var Raid = React.createClass({
             }
         } else {
             this.setState({"game": game});
+        }
+        // Render updated game state to canvas
+        if(this.state.renderer == "canvas"){
+            this.state.gameRenderer.render(game);
         }
     },
     setGameMode: function(mode) {
@@ -544,11 +606,13 @@ var Raid = React.createClass({
         this.state.gameRunner.step();
     },
     renderGame: function() {
+        var score = this.state.finalScore || this.state.gameRunner.scoreManager.getScore();
         var content = (
             <BetweenLevelContent
                 level={this.state.level}
                 mode={this.state.mode}
                 message={this.state.message}
+                score={score}
             />);
         if (this.state.game) {
             var nearbyUnits = this.state.game.player.player.pc.senseNearbyUnits();
@@ -561,9 +625,14 @@ var Raid = React.createClass({
                     closetUnitDistSq = d;
                 }
             }
-            content = (
-                <Row>
-                    <Col xs={12} md={9}>
+            // Setup renderer
+            var renderer = null;
+            if(this.state.renderer == "canvas"){
+                renderer = (
+                        <CanvasRenderer canvas={this.state.canvas} />
+                    );
+            }else{
+                renderer = (
                         <TableRenderer
                             width={this.state.game.map.width}
                             height={this.state.game.map.height}
@@ -574,11 +643,17 @@ var Raid = React.createClass({
                             units={this.state.game.map.units}
                             playerLoc={this.state.game.player.location}
                             />
+                    );
+            }
+            content = (
+                <Row>
+                    <Col xs={12} md={9}>
+                        {renderer}
                     </Col>
                     <Col xs={12} md={3}>
                         <Row>
                             <Col xs={4} md={12}>
-                                <UnitStats unit={this.state.game.player} />
+                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
                             </Col>
                             <Col xs={4} md={12}>
                                 <UnitStats unit={closestUnit} />

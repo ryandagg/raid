@@ -1,3 +1,7 @@
+#content{
+    margin-top: 20px;
+}
+
 #map {
     font-weight: bold;
     color: #000000;
@@ -36,6 +40,8 @@
 .tree {
     /* http://opengameart.org/node/10054 */
     background: url(../images/textures/tree.png) center center fixed;
+}
+td.tree {
     border-radius: 100%;
 }
 
@@ -52,5 +58,7 @@
 .rock {
     /* http://opengameart.org/node/8062 */
     background: url(../images/textures/rock.png) center center fixed;
+}
+td.rock {
     border-radius: 100%;
 }
