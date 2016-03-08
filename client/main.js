@@ -483,7 +483,7 @@ var BetweenLevelContent = React.createClass({
         );
     },
     renderTutorial: function() {
-        i = 0;
+        var i = 0;
         lines = TutorialVerbage(this.props.level);
         return (
             <Well>
@@ -507,8 +507,9 @@ var Raid = React.createClass({
     getInitialState: function() {
         var gR = new GameRunner(this.updateGame);
         var canvas = document.createElement('canvas');
-        canvas.width = GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
-        canvas.height = GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT;
+        var canvasWidth = this.getCanvasWidth();
+        canvas.width = canvasWidth;
+        canvas.height = canvasWidth * GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT /  GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
         return {
             "gameRunner": gR,
             "game": null,
@@ -524,6 +525,17 @@ var Raid = React.createClass({
         var playerCreator = CompilePlayerCode(playerCode);
         this.state.gameRunner.setPlayerCreator(playerCreator);
         this.startGame();
+    },
+    getCanvasWidth: function() {
+        var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        w = Math.min(1107, w);
+        var canvasWidth = w;
+        if (w > 1000) {
+            canvasWidth = .75 * .9 * w;
+        } else {
+            canvasWidth *= .85;
+        }
+        return canvasWidth;
     },
     startGame: function() {
         this.state.gameRunner.createNewGame(this.state.level, this.state.mode === TUTORIAL);
