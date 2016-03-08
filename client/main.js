@@ -191,7 +191,7 @@ var CanvasRenderer = React.createClass({
     },
     render: function() {
         return (
-            <div />
+            <div style={{marginBottom: 30 + 'px'}} />
             );
     }
 });
@@ -484,16 +484,15 @@ var Raid = React.createClass({
     getInitialState: function() {
         var gR = new GameRunner(this.updateGame);
         var canvas = document.createElement('canvas');
-        canvas.width = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_WIDTH;
-        canvas.height = GraphicsConstants.FX_CANVAS_INTERNAL_CANVAS_HEIGHT;
-        canvas.style = "width: 100%;";
+        canvas.width = GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
+        canvas.height = GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT;
         return {
             "gameRunner": gR,
             "game": null,
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "table", // options: "canvas" or "table"
+            "renderer": "canvas", // options: "canvas" or "table"
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas)
         }
