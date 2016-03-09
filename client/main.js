@@ -214,20 +214,22 @@ var samplePlayer = [
     "",
     "RaidPlayer.prototype = {",
     "   act: function() {",
-    "      if(this.pc.canMove(Direction.SOUTH)) {",
-    "        this.pc.move(Direction.SOUTH);",
-    "      }",
+    "       if(this.pc.canMove(Direction.SOUTH)) {",
+    "           this.pc.move(Direction.SOUTH);",
+    "           return;",
+    "       }",
     "   }",
     "};"
 ];
 
 var PlayerCode = React.createClass({
     onPlayerUpdate: function(playerCode) {
+        localStorage.setItem("player", JSON.stringify(playerCode));
         this.setState({"player": playerCode});
     },
     getInitialState: function() {
         return {
-            "player": samplePlayer.join('\n')
+            "player": JSON.parse(localStorage.getItem("player")) || samplePlayer.join('\n')
         }
     },
     onPlayerRun: function() {
