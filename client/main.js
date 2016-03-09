@@ -516,7 +516,7 @@ var Raid = React.createClass({
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "table", // options: "canvas" or "table"
+            "renderer": "canvas", // options: "canvas" or "table"
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas)
         }
@@ -579,7 +579,7 @@ var Raid = React.createClass({
         }
         // Render updated game state to canvas
         if(this.state.renderer == "canvas"){
-            this.state.gameRenderer.render(game);
+            this.state.gameRenderer.render(game, this.state.gameRunner.getSpeed());
         }
     },
     setGameMode: function(mode) {
