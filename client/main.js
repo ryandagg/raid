@@ -581,7 +581,7 @@ var Raid = React.createClass({
         }
         // Render updated game state to canvas
         if(this.state.renderer == "canvas"){
-            this.state.gameRenderer.render(game, this.state.gameRunner.getSpeed());
+            this.state.gameRenderer.render(game);
         }
     },
     setGameMode: function(mode) {
