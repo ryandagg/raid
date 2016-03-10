@@ -283,11 +283,11 @@ var API = React.createClass({
                             <Panel header="heal()" eventKey="20">
                                 Heals the unit
                             </Panel>
-                            <Panel header="bool canMeleeAttack(Direction d)" eventKey="3">
+                            <Panel header="bool canMeleeAttack(MapLocation m)" eventKey="3">
                                 Returns true if the unit can attack that direction
                             </Panel>
                             <Panel header="meleeAttack(Direction d)" eventKey="4">
-                                Melee attacks in direction d
+                                Melee attacks at m.
                             </Panel>
                             <Panel header="bool canMagicAttack(MapLocation m)" eventKey="5">
                                 Returns true if the unit can attack that location
@@ -655,12 +655,6 @@ var Raid = React.createClass({
                     <Col xs={12} md={3}>
                         <Row>
                             <Col xs={4} md={12}>
-                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
-                            </Col>
-                            <Col xs={4} md={12}>
-                                <UnitStats unit={closestUnit} />
-                            </Col>
-                            <Col xs={4} md={12}>
                                 <GameStats
                                     setSpeed={this.setSpeed}
                                     game={this.state.game}
@@ -669,6 +663,12 @@ var Raid = React.createClass({
                                     pause={this.pause}
                                     step={this.step}
                                 />
+                            </Col>
+                            <Col xs={4} md={12}>
+                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
+                            </Col>
+                            <Col xs={4} md={12}>
+                                <UnitStats unit={closestUnit} />
                             </Col>
                         </Row>
                     </Col>
