@@ -213,16 +213,16 @@ var CanvasRenderer = React.createClass({
 
 var samplePlayer = [
     "function RaidPlayer(playerController) {",
-    "   this.pc = playerController;",
+    "  this.pc = playerController;",
     "}",
     "",
     "RaidPlayer.prototype = {",
-    "   act: function() {",
-    "       if(this.pc.canMove(Direction.SOUTH)) {",
-    "           this.pc.move(Direction.SOUTH);",
-    "           return;",
-    "       }",
-    "   }",
+    "  act: function() {",
+    "    if(this.pc.canMove(Direction.SOUTH)) {",
+    "      this.pc.move(Direction.SOUTH);",
+    "      return;",
+    "    }",
+    "  }",
     "};"
 ];
 
@@ -245,19 +245,18 @@ var PlayerCode = React.createClass({
             <form>
                 <Button onClick={this.onPlayerRun}>Run</Button>
                 <AceEditor
-                    mode="javascript"
-                    theme="chrome"
-                    ref="playerText"
+                    fontSize={12}
+                    highlightActiveLine={true}
                     label="RaidPlayer.js"
+                    maxLines={50}
+                    mode="javascript"
                     onChange={this.onPlayerUpdate}
+                    ref="playerText"
+                    showPrintMargin={false}
+                    tabSize={2}
+                    theme="chrome"
                     value={this.state.player}
                     width="100%"
-                    fontSize={14}
-                    maxLines={50}
-                    editorProps= {{
-                        $blockScrolling: true,
-                        $highlightActiveLine: true
-                    }}
                 />
             </form>
             )
