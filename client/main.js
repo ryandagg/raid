@@ -90,17 +90,34 @@ var GameStats = React.createClass({
 
             );
         }
-        return (
+
+        var content = (
             <Well>
-                <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
-                {playPause}
-                <ButtonGroup>
-                    <Button onClick={this.slow}>.5x</Button>
-                    <Button onClick={this.normal}>1x</Button>
-                    <Button onClick={this.fast}>2x</Button>
-                    <Button onClick={this.ultra}>4x</Button>
-                </ButtonGroup>
+                <h3>Tutorial Level: {this.props.level}</h3>
+                <h4>Score: {this.props.score}</h4>
             </Well>
+        );
+        if (this.props.game) {
+            content = (
+                <Well>
+                    <h3>Tutorial Level: {this.props.level}</h3>
+                    <h4>Score: {this.props.score}</h4>
+                    <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
+                    {playPause}
+                    <ButtonGroup>
+                        <Button onClick={this.slow}>.5x</Button>
+                        <Button onClick={this.normal}>1x</Button>
+                        <Button onClick={this.fast}>2x</Button>
+                        <Button onClick={this.ultra}>4x</Button>
+                    </ButtonGroup>
+                </Well>
+            );
+        }
+
+        return (
+            <div>
+                {content}
+            </div>
         );
     }
 });
@@ -478,8 +495,6 @@ var BetweenLevelContent = React.createClass({
     renderAdventure: function() {
         return (
             <Well>
-                <h3>Adventure Level: {this.props.level}</h3>
-                <p>Score: {this.props.score}</p>
                 <p>{this.props.message}</p>
                 <br />
                 <p>Press Run to Continue</p>
@@ -489,12 +504,10 @@ var BetweenLevelContent = React.createClass({
     },
     renderTutorial: function() {
         var i = 0;
-        lines = TutorialVerbage(this.props.level);
+        var lines = TutorialVerbage(this.props.level);
         return (
             <Well>
-                <h3>Tutorial Level: {this.props.level}</h3>
-                <h4>Score: {this.props.score}</h4>
-                <p><b>{this.props.message}</b></p>
+                <h3>{this.props.message}</h3>
                 {lines.map(function(line) {
                     i++;
                     return <p key={i}>{line}</p>;
@@ -532,11 +545,12 @@ var Raid = React.createClass({
         this.startGame();
     },
     getCanvasWidth: function() {
+        console.log(window.innerWidth);
         var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         w = Math.min(1107, w);
         var canvasWidth = w;
         if (w > 1000) {
-            canvasWidth = .75 * .9 * w;
+            canvasWidth = 652; /* Based on min width for containing col-lg-7 */
         } else {
             canvasWidth *= .85;
         }
@@ -612,13 +626,24 @@ var Raid = React.createClass({
     },
     renderGame: function() {
         var score = this.state.finalScore || this.state.gameRunner.scoreManager.getScore();
-        var content = (
+        var mainContent = (
             <BetweenLevelContent
                 level={this.state.level}
                 mode={this.state.mode}
                 message={this.state.message}
-                score={score}
-            />);
+            />
+        );
+        var sideContent = (
+            <Row>
+                <Col lg={12} md={12} xs={12}>
+                    <GameStats
+                        level={this.state.level}
+                        mode={this.state.mode}
+                        score={score}
+                    />
+                </Col>
+            </Row>
+        );
         if (this.state.game) {
             var nearbyUnits = this.state.game.player.player.pc.senseNearbyUnits();
             var closestUnit = null;
@@ -633,11 +658,11 @@ var Raid = React.createClass({
             // Setup renderer
             var renderer = null;
             if(this.state.renderer == "canvas"){
-                renderer = (
+                mainContent = (
                         <CanvasRenderer canvas={this.state.canvas} />
                     );
             }else{
-                renderer = (
+                mainContent = (
                         <TableRenderer
                             width={this.state.game.map.width}
                             height={this.state.game.map.height}
@@ -650,37 +675,40 @@ var Raid = React.createClass({
                             />
                     );
             }
-            content = (
+            sideContent = (
                 <Row>
-                    <Col lg={8} md={12} xs={12}>
-                        {renderer}
+                    <Col lg={12} md={4} xs={12}>
+                        <GameStats
+                            level={this.state.level}
+                            mode={this.state.mode}
+                            score={score}
+                            setSpeed={this.setSpeed}
+                            game={this.state.game}
+                            paused={this.state.gameRunner.paused}
+                            play={this.play}
+                            pause={this.pause}
+                            step={this.step}
+                        />
                     </Col>
-                    <Col lg={4} md={12} xs={12}>
-                        <Row>
-                            <Col lg={12} md={4} xs={12}>
-                                <GameStats
-                                    setSpeed={this.setSpeed}
-                                    game={this.state.game}
-                                    paused={this.state.gameRunner.paused}
-                                    play={this.play}
-                                    pause={this.pause}
-                                    step={this.step}
-                                />
-                            </Col>
-                            <Col lg={6} md={4} xs={6}>
-                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
-                            </Col>
-                            <Col lg={6} md={4} xs={6}>
-                                <UnitStats unit={closestUnit} />
-                            </Col>
-                        </Row>
+                    <Col lg={6} md={4} xs={6}>
+                        <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
+                    </Col>
+                    <Col lg={6} md={4} xs={6}>
+                        <UnitStats unit={closestUnit} />
                     </Col>
                 </Row>
             );
         }
         return (
             <Grid>
-                {content}
+                <Row>
+                    <Col lg={7} md={12} xs={12}>
+                        {mainContent}
+                    </Col>
+                    <Col lg={5} md={12} xs={12}>
+                        {sideContent}
+                    </Col>
+                </Row>
 
                 <Row>
                     <Col xs={12} md={7} lg={7}>
