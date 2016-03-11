@@ -39,7 +39,11 @@ var UnitStats = React.createClass({
     render: function() {
         var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
-            return (<p>No units in range</p>);
+            return (
+                <Well>
+                    <p>No units in range</p>
+                </Well>
+            );
         }
         if (this.props.unit.defeatPoints) {
             scoreOrPointsLabel = "Value";
@@ -55,7 +59,7 @@ var UnitStats = React.createClass({
                 <p>{this.props.unit.description}</p>
                 <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
-                <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
+                <p>Sight: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
         );
     }
@@ -649,12 +653,12 @@ var Raid = React.createClass({
             }
             content = (
                 <Row>
-                    <Col xs={12} md={9}>
+                    <Col lg={8} md={12} xs={12}>
                         {renderer}
                     </Col>
-                    <Col xs={12} md={3}>
+                    <Col lg={4} md={12} xs={12}>
                         <Row>
-                            <Col xs={4} md={12}>
+                            <Col lg={12} md={4} xs={12}>
                                 <GameStats
                                     setSpeed={this.setSpeed}
                                     game={this.state.game}
@@ -664,10 +668,10 @@ var Raid = React.createClass({
                                     step={this.step}
                                 />
                             </Col>
-                            <Col xs={4} md={12}>
+                            <Col lg={6} md={4} xs={6}>
                                 <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
                             </Col>
-                            <Col xs={4} md={12}>
+                            <Col lg={6} md={4} xs={6}>
                                 <UnitStats unit={closestUnit} />
                             </Col>
                         </Row>
@@ -680,10 +684,10 @@ var Raid = React.createClass({
                 {content}
 
                 <Row>
-                    <Col xs={12} md={12} lg={7}>
+                    <Col xs={12} md={7} lg={7}>
                         <PlayerCode compileAndStart={this.compileAndStart}/>
                     </Col>
-                    <Col xs={12} md={12} lg={5}>
+                    <Col xs={12} md={5} lg={5}>
                         <API />
                     </Col>
                 </Row>
