@@ -321,7 +321,7 @@ var API = React.createClass({
                             <Panel header="bool canMeleeAttack(MapLocation m)" eventKey="3">
                                 Returns true if the unit can attack that direction
                             </Panel>
-                            <Panel header="meleeAttack(Direction d)" eventKey="4">
+                            <Panel header="meleeAttack(MapLocation m)" eventKey="4">
                                 Melee attacks at m.
                             </Panel>
                             <Panel header="bool canMagicAttack(MapLocation m)" eventKey="5">
@@ -339,31 +339,34 @@ var API = React.createClass({
                             <Panel header="double getDelay()" eventKey="9">
                                 Get your player's current delay.
                             </Panel>
-                            <Panel header="MapLocation getCurrentLocation()" eventKey="10">
+                            <Panel header="UnitInfo getMyInfo()" eventKey="10">
+                                Get your player's current UnitInfo.
+                            </Panel>
+                            <Panel header="MapLocation getCurrentLocation()" eventKey="11">
                                 Get your player's current location.
                             </Panel>
-                            <Panel header="int getGameRound()" eventKey="11">
+                            <Panel header="int getGameRound()" eventKey="12">
                                 Get the current game round.
                             </Panel>
-                            <Panel header="int getGameRoundLimit()" eventKey="12">
+                            <Panel header="int getGameRoundLimit()" eventKey="13">
                                 Gets the game round limit.
                             </Panel>
-                            <Panel header="bool canSense(MapLocation m)" eventKey="13">
+                            <Panel header="bool canSense(MapLocation m)" eventKey="14">
                                 Returns true if m is in this units sensor range.
                             </Panel>
-                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="14">
+                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="15">
                                 Returns true if location m is a wall.
                             </Panel>
-                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="15">
+                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="16">
                                 Senses the unit at that location.
                             </Panel>
-                            <Panel header="UnitInfo[] senseNearbyUnits()" eventKey="16">
+                            <Panel header="UnitInfo[] senseNearbyUnits()" eventKey="17">
                                 Senses all units in sensorRange
                             </Panel>
-                            <Panel header="Direction senseDirectionToExit()" eventKey="17">
+                            <Panel header="Direction senseDirectionToExit()" eventKey="18">
                                 Senses the direction to the level exit;
                             </Panel>
-                            <Panel header="MapLocation senseExitLocIfClose()" eventKey="18">
+                            <Panel header="MapLocation senseExitLocIfClose()" eventKey="19">
                                 Senses the location of the exit if you are close enough;
                             </Panel>
 
@@ -433,14 +436,14 @@ var API = React.createClass({
                             <li>MAGIC_ATTACK_SPLASH_PERCENTAGE: .25,</li>
                             <li>MAX_MELEE_ATTACK_RADIUS_SQUARED: 2,</li>
                             <li>SENSE_EXIT_THRESHOLD: 144,</li>
-                            <li>PLAYER_MOVE_DELAY: 2,</li>
-                            <li>PLAYER_HEAL_POWER: 5,</li>
-                            <li>PLAYER_HEAL_DELAY: 20,</li>
-                            <li>PLAYER_MELEE_POWER: 6,</li>
-                            <li>PLAYER_MELEE_DELAY: 2,</li>
-                            <li>PLAYER_MAGIC_POWER: 4,</li>
-                            <li>PLAYER_MAGIC_DELAY: 4,</li>
-                            <li>PLAYER_RANGED_POWER: 6,</li>
+                            <li>PLAYER_MOVE_DELAY: 2</li>
+                            <li>PLAYER_HEAL_POWER: 10</li>
+                            <li>PLAYER_HEAL_DELAY: 20</li>
+                            <li>PLAYER_MELEE_POWER: 20</li>
+                            <li>PLAYER_MELEE_DELAY: 2</li>
+                            <li>PLAYER_MAGIC_POWER: 16</li>
+                            <li>PLAYER_MAGIC_DELAY: 4</li>
+                            <li>PLAYER_RANGED_POWER: 18</li>
                             <li>PLAYER_RANGED_DELAY: 3</li>
                         </ul>
                     </Panel>
@@ -549,7 +552,7 @@ var Raid = React.createClass({
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "canvas", // options: "canvas" or "table"
+            "renderer": "table", // options: "canvas" or "table"
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas),
             "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
