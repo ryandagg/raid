@@ -86,6 +86,7 @@ var GameController = React.createClass({
         this.props.compile(this.props.playerCode);
     },
     render: function() {
+        var mode = (this.props.mode === TUTORIAL ? "Tutorial" : "Adventure");
         var playPause = (
             <ButtonGroup>
                 <Button onClick={this.props.pause}>Pause</Button>
@@ -105,7 +106,7 @@ var GameController = React.createClass({
 
         var content = (
             <Well>
-                <h3>Tutorial Level: {this.props.level}</h3>
+                <h3>{mode} Level: {this.props.level}</h3>
                 <h4>Score: {this.props.score}</h4>
                 <Button onClick={this.compileAndRun}>Run</Button>
             </Well>
@@ -113,7 +114,7 @@ var GameController = React.createClass({
         if (this.props.game) {
             content = (
                 <Well>
-                    <h3>Tutorial Level: {this.props.level}</h3>
+                    <h3>{mode} Level: {this.props.level}</h3>
                     <h4>Score: {this.props.score}</h4>
                     <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
                     <ButtonToolbar>
@@ -321,7 +322,7 @@ var API = React.createClass({
                             <Panel header="bool canMeleeAttack(MapLocation m)" eventKey="3">
                                 Returns true if the unit can attack that direction.
                             </Panel>
-                            <Panel header="meleeAttack(Direction d)" eventKey="4">
+                            <Panel header="meleeAttack(MapLocation m)" eventKey="4">
                                 Melee attacks at m.
                             </Panel>
                             <Panel header="bool canMagicAttack(MapLocation m)" eventKey="5">
@@ -339,38 +340,41 @@ var API = React.createClass({
                             <Panel header="double getDelay()" eventKey="9">
                                 Get your player's current delay.
                             </Panel>
-                            <Panel header="MapLocation getCurrentLocation()" eventKey="10">
+                            <Panel header="UnitInfo getMyInfo()" eventKey="10">
+                                Get your player's current UnitInfo.
+                            </Panel>
+                            <Panel header="MapLocation getCurrentLocation()" eventKey="11">
                                 Get your player's current location.
                             </Panel>
-                            <Panel header="int getGameRound()" eventKey="11">
+                            <Panel header="int getGameRound()" eventKey="12">
                                 Get the current game round.
                             </Panel>
-                            <Panel header="int getGameRoundLimit()" eventKey="12">
+                            <Panel header="int getGameRoundLimit()" eventKey="13">
                                 Gets the game round limit.
                             </Panel>
-                            <Panel header="bool canSense(MapLocation m)" eventKey="13">
+                            <Panel header="bool canSense(MapLocation m)" eventKey="14">
                                 Returns true if m is in this units sensor range.
                             </Panel>
-                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="14">
+                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="15">
                                 Returns true if location m is a wall.
                             </Panel>
-                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="15">
+                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="16">
                                 Senses the unit at that location.
                             </Panel>
-                            <Panel header="UnitInfo[] senseNearbyUnits()" eventKey="16">
+                            <Panel header="UnitInfo[] senseNearbyUnits()" eventKey="17">
                                 Senses all units in sensorRange
                             </Panel>
-                            <Panel header="Direction senseDirectionToExit()" eventKey="17">
+                            <Panel header="Direction senseDirectionToExit()" eventKey="18">
                                 Senses the direction to the level exit;
                             </Panel>
-                            <Panel header="MapLocation senseExitLocIfClose()" eventKey="18">
+                            <Panel header="MapLocation senseExitLocIfClose()" eventKey="19">
                                 Senses the location of the exit if you are close enough;
                             </Panel>
 
                         </Accordion>
                     </Panel>
                     <Panel header="MapLocation" eventKey="2">
-                        <ul>
+                        <ul className="list-unstyled">
                             <li><code>x</code>: returns <code>int</code>, the east/west coordinate (east (0) -> west (width))</li>
                             <li><code>y</code>: returns <code>int</code>, the north/south cooredinate (north (0) -> south (height))</li>
                         </ul>
@@ -396,7 +400,7 @@ var API = React.createClass({
                         </Accordion>
                     </Panel>
                     <Panel header="Direction" eventKey="3">
-                        <ul>
+                        <ul className="list-unstyled">
                             <li><code>x</code>: returns <code>int</code>, the east/west component (east (-1) -> west (1))</li>
                             <li><code>y</code>: returns <code>int</code>, the north/south component (north (-1) -> south (1))</li>
                             <li><code>Direction.NORTH\SOUTH\EAST\WEST\NORTH_EAST\NORTH_WEST\SOUTH_EAST\SOUTH_WEST</code></li>
@@ -428,7 +432,7 @@ var API = React.createClass({
                     </Panel>
                     <Panel header="GameConstants" eventKey="4">
                         <b>Access through GameContants.VAR_NAME</b>
-                        <ul class="list-unstyled">
+                        <ul className="list-unstyled">
                             <li><code>MIN_RANGED_ATTACK_RADIUS_SQUARED</code>: 16,</li>
                             <li><code>MAX_RANGED_ATTACK_RADIUS_SQUARED</code>: 49,</li>
                             <li><code>MAX_MAGIC_ATTACK_RADIUS_SQUARED</code>: 36,</li>
@@ -436,19 +440,19 @@ var API = React.createClass({
                             <li><code>MAX_MELEE_ATTACK_RADIUS_SQUARED</code>: 2,</li>
                             <li><code>SENSE_EXIT_THRESHOLD</code>: 144,</li>
                             <li><code>PLAYER_MOVE_DELAY</code>: 2,</li>
-                            <li><code>PLAYER_HEAL_POWER</code>: 5,</li>
+                            <li><code>PLAYER_HEAL_POWER</code>: 10,</li>
                             <li><code>PLAYER_HEAL_DELAY</code>: 20,</li>
-                            <li><code>PLAYER_MELEE_POWER</code>: 6,</li>
+                            <li><code>PLAYER_MELEE_POWER</code>: 20,</li>
                             <li><code>PLAYER_MELEE_DELAY</code>: 2,</li>
-                            <li><code>PLAYER_MAGIC_POWER</code>: 4,</li>
+                            <li><code>PLAYER_MAGIC_POWER</code>: 16,</li>
                             <li><code>PLAYER_MAGIC_DELAY</code>: 4,</li>
-                            <li><code>PLAYER_RANGED_POWER</code>: 6,</li>
+                            <li><code>PLAYER_RANGED_POWER</code>: 18,</li>
                             <li><code>PLAYER_RANGED_DELAY</code>: 3</li>
                         </ul>
                     </Panel>
                     <Panel header="UnitInfo" eventKey="5">
                         <b>Values are static, check them again for new values</b>
-                        <ul class="list-unstyled">
+                        <ul className="list-unstyled">
                             <li><code>name</code> the name of the unit</li>
                             <li><code>type</code> the symbol of the unit</li>
                             <li><code>hp</code> the current hp of the unit</li>
@@ -568,7 +572,7 @@ var Raid = React.createClass({
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "canvas", // options: "canvas" or "table"
+            "renderer": "table", // options: "canvas" or "table"
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas),
             "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
