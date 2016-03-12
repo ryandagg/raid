@@ -4,7 +4,10 @@ var ReactDOM = require('react-dom');
 // react bootstrap
 var Accordion = require('react-bootstrap').Accordion;
 var Button = require('react-bootstrap').Button;
+var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
+var MenuItem = require('react-bootstrap').MenuItem;
+var DropdownButton = require('react-bootstrap').DropdownButton;
 var Grid = require('react-bootstrap').Grid;
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
@@ -66,7 +69,7 @@ var UnitStats = React.createClass({
 });
 
 
-var GameStats = React.createClass({
+var GameController = React.createClass({
     slow: function() {
         this.props.setSpeed(600);
     },
@@ -79,13 +82,22 @@ var GameStats = React.createClass({
     ultra: function() {
         this.props.setSpeed(75);
     },
+    compileAndRun: function() {
+        this.props.compile(this.props.playerCode);
+    },
     render: function() {
-        var playPause = (<ButtonGroup><Button onClick={this.props.pause}>Pause</Button></ButtonGroup>);
+        var playPause = (
+            <ButtonGroup>
+                <Button onClick={this.props.pause}>Pause</Button>
+                <Button onClick={this.compileAndRun} bsStyle="danger">Restart</Button>
+            </ButtonGroup>
+        );
         if (this.props.paused) {
             playPause = (
                 <ButtonGroup>
-                    <Button onClick={this.props.play}>Play</Button>
+                    <Button onClick={this.props.play}>Continue</Button>
                     <Button onClick={this.props.step}>Step</Button>
+                    <Button onClick={this.compileAndRun} bsStyle="danger">Restart</Button>
                 </ButtonGroup>
 
             );
@@ -95,6 +107,7 @@ var GameStats = React.createClass({
             <Well>
                 <h3>Tutorial Level: {this.props.level}</h3>
                 <h4>Score: {this.props.score}</h4>
+                <Button onClick={this.compileAndRun}>Run</Button>
             </Well>
         );
         if (this.props.game) {
@@ -103,13 +116,15 @@ var GameStats = React.createClass({
                     <h3>Tutorial Level: {this.props.level}</h3>
                     <h4>Score: {this.props.score}</h4>
                     <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
-                    {playPause}
-                    <ButtonGroup>
-                        <Button onClick={this.slow}>.5x</Button>
-                        <Button onClick={this.normal}>1x</Button>
-                        <Button onClick={this.fast}>2x</Button>
-                        <Button onClick={this.ultra}>4x</Button>
-                    </ButtonGroup>
+                    <ButtonToolbar>
+                        {playPause}
+                        <DropdownButton title="Speed" id="bg-nested-dropdown">
+                            <MenuItem eventKey="1" onSelect={this.slow}>.5x</MenuItem>
+                            <MenuItem eventKey="2" onSelect={this.normal}>1x</MenuItem>
+                            <MenuItem eventKey="3" onSelect={this.fast}>2x</MenuItem>
+                            <MenuItem eventKey="4" onSelect={this.ultra}>4x</MenuItem>
+                        </DropdownButton>
+                    </ButtonToolbar>
                 </Well>
             );
         }
@@ -536,8 +551,13 @@ var Raid = React.createClass({
             "message": "Welcome!",
             "renderer": "table", // options: "canvas" or "table"
             "canvas": canvas,
-            "gameRenderer": new GameRenderer(canvas)
+            "gameRenderer": new GameRenderer(canvas),
+            "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
         }
+    },
+    onPlayerCodeUpdate: function(playerCode) {
+        localStorage.setItem("playerCode", JSON.stringify(playerCode));
+        this.setState({"playerCode": playerCode});
     },
     compileAndStart: function(playerCode) {
         var playerCreator = CompilePlayerCode(playerCode);
@@ -635,10 +655,12 @@ var Raid = React.createClass({
         var sideContent = (
             <Row>
                 <Col lg={12} md={12} xs={12}>
-                    <GameStats
+                    <GameController
                         level={this.state.level}
                         mode={this.state.mode}
                         score={score}
+                        compile={this.compileAndStart}
+                        playerCode={this.state.playerCode}
                     />
                 </Col>
             </Row>
@@ -677,7 +699,7 @@ var Raid = React.createClass({
             sideContent = (
                 <Row>
                     <Col lg={12} md={4} xs={12}>
-                        <GameStats
+                        <GameController
                             level={this.state.level}
                             mode={this.state.mode}
                             score={score}
@@ -687,6 +709,8 @@ var Raid = React.createClass({
                             play={this.play}
                             pause={this.pause}
                             step={this.step}
+                            compile={this.compileAndStart}
+                            playerCode={this.state.playerCode}
                         />
                     </Col>
                     <Col lg={6} md={4} xs={6}>
@@ -711,7 +735,20 @@ var Raid = React.createClass({
 
                 <Row>
                     <Col xs={12} md={7} lg={7}>
-                        <PlayerCode compileAndStart={this.compileAndStart}/>
+                        <AceEditor
+                            fontSize={12}
+                            highlightActiveLine={true}
+                            label="RaidPlayer.js"
+                            maxLines={50}
+                            mode="javascript"
+                            onChange={this.onPlayerCodeUpdate}
+                            ref="playerText"
+                            showPrintMargin={false}
+                            tabSize={2}
+                            theme="chrome"
+                            value={this.state.playerCode}
+                            width="100%"
+                        />
                     </Col>
                     <Col xs={12} md={5} lg={5}>
                         <API />
