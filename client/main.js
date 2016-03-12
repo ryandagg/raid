@@ -404,7 +404,7 @@ var API = React.createClass({
                             <li><code>x</code>: returns <code>int</code>, the east/west component (east (-1) -> west (1))</li>
                             <li><code>y</code>: returns <code>int</code>, the north/south component (north (-1) -> south (1))</li>
                             <li><code>Direction.NORTH\SOUTH\EAST\WEST\NORTH_EAST\NORTH_WEST\SOUTH_EAST\SOUTH_WEST</code></li>
-                            <li><code>Direction.OMNI</code> - returned when you are at a location and do directionTo that same location</li>
+                            <li><code>Direction.OMNI</code> - returned when you are at a location and do directionTo that same location.</li>
                         </ul>
                         <Accordion>
                             <Panel header="bool equals(Direction d)" eventKey="1">
@@ -420,13 +420,13 @@ var API = React.createClass({
                                 Returns the opposite direction. Ie NORTH.opposite() -> SOUTH
                             </Panel>
                             <Panel header="bool isDiagonal()" eventKey="5">
-                                Returns true if this direction is not cardinal
+                                Returns true if this direction is not cardinal.
                             </Panel>
                             <Panel header="String toString()" eventKey="6">
-                                Returns the string representation of this direction
+                                Returns the string representation of this direction.
                             </Panel>
                             <Panel header="Direction randomDirection()" eventKey="6">
-                                Returns a random direction (not including OMNI)
+                                Returns a random direction (not including OMNI).
                             </Panel>
                         </Accordion>
                     </Panel>
@@ -453,27 +453,27 @@ var API = React.createClass({
                     <Panel header="UnitInfo" eventKey="5">
                         <b>Values are static, check them again for new values</b>
                         <ul className="list-unstyled">
-                            <li><code>name</code> the name of the unit</li>
-                            <li><code>type</code> the symbol of the unit</li>
-                            <li><code>hp</code> the current hp of the unit</li>
-                            <li><code>maxHp</code> the maxHp of that unit</li>
-                            <li><code>canBeHealed</code> indicates if the unit can be healed</li>
-                            <li><code>location</code> the maplocation of the unit when you sensed it</li>
-                            <li><code>delay</code> the current delay of the unit (can't act until delay less than 1)</li>
-                            <li><code>movementDelay</code> the delay incurred by movement</li>
-                            <li><code>healPower</code> how much HP the unit can heal</li>
-                            <li><code>healDelay</code> how much delay is incurred by healing (0 if can't heal)</li>
-                            <li><code>meleeAttackPower</code> how much damage a melee attack does</li>
-                            <li><code>meleeAttackDelay</code> how much delay is incurred by melee attack (0 if can't attack)</li>
-                            <li><code>magicAttackPower</code> how much damage a magic attack does</li>
-                            <li><code>magicAttackDelay</code> how much delay is incurred by magic attack (0 if can't attack)</li>
-                            <li><code>rangedAttackPower</code> how much damage a ranged attack does</li>
-                            <li><code>rangedAttackDelay</code> how much delay is incurred by a ranged attack (0 if can't attack)</li>
-                            <li><code>sensorRadiusSquared</code> how far the unit can see</li>
-                            <li><code>alertRadiusSquared</code> once the unit sees you, it alerts nearby allies in this range</li>
-                            <li><code>spawnDelay</code> how many turns after spawning a unit this unit can spawn another</li>
-                            <li><code>currentSpawnDelay</code> how many turns until next unit is spawned</li>
-                            <li><code>spawnedUnitType</code> what type of unit will be spawned</li>
+                            <li><code>name</code> the name of the unit.</li>
+                            <li><code>type</code> the symbol of the unit.</li>
+                            <li><code>hp</code> the current hp of the unit.</li>
+                            <li><code>maxHp</code> the maxHp of that unit.</li>
+                            <li><code>canBeHealed</code> indicates if the unit can be healed.</li>
+                            <li><code>location</code> the maplocation of the unit when you sensed it.</li>
+                            <li><code>delay</code> the current delay of the unit (can't act until delay less than 1).</li>
+                            <li><code>movementDelay</code> the delay incurred by movement.</li>
+                            <li><code>healPower</code> how much HP the unit can heal.</li>
+                            <li><code>healDelay</code> how much delay is incurred by healing (0 if can't heal).</li>
+                            <li><code>meleeAttackPower</code> how much damage a melee attack does.</li>
+                            <li><code>meleeAttackDelay</code> how much delay is incurred by melee attack (0 if can't attack).</li>
+                            <li><code>magicAttackPower</code> how much damage a magic attack does.</li>
+                            <li><code>magicAttackDelay</code> how much delay is incurred by magic attack (0 if can't attack).</li>
+                            <li><code>rangedAttackPower</code> how much damage a ranged attack does.</li>
+                            <li><code>rangedAttackDelay</code> how much delay is incurred by a ranged attack (0 if can't attack).</li>
+                            <li><code>sensorRadiusSquared</code> how far the unit can see.</li>
+                            <li><code>alertRadiusSquared</code> once the unit sees you, it alerts nearby allies in this range.</li>
+                            <li><code>spawnDelay</code> how many turns after spawning a unit this unit can spawn another.</li>
+                            <li><code>currentSpawnDelay</code> how many turns until next unit is spawned.</li>
+                            <li><code>spawnedUnitType</code> what type of unit will be spawned.</li>
                         </ul>
                     </Panel>
                 </Accordion>
@@ -505,7 +505,7 @@ var SplashScreen = React.createClass({
                 <br />
                 <div className="container lead">
                     <div className="col-md-8 col-md-offset-2">
-                        Far fields. Many dungeons. Much monsters. And let's not forget javascript! This
+                        Far fields. Many dungeons. Much monsters. And let's not forget <code>javascript</code>! This
                         is a code-your-own-adventure take on a classic game. How far can you get?
                         <br />
                         <br />
