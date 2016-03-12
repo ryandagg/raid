@@ -579,7 +579,7 @@ var BetweenLevelContent = React.createClass({
 
 var Raid = React.createClass({
     getInitialState: function() {
-        var gR = new GameRunner(this.updateGame);
+        var gR = new GameRunner(this.renderUI, this.renderCanvas);
         var canvas = document.createElement('canvas');
         canvas.width = GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
         canvas.height = GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT;
@@ -622,7 +622,7 @@ var Raid = React.createClass({
         this.setState({"game": this.state.gameRunner.game});
         this.state.gameRunner.play();
     },
-    updateGame: function(game) {
+    renderUI: function(game) {
         if (!this.state.game) {
             return;
         }
@@ -656,9 +656,10 @@ var Raid = React.createClass({
         } else {
             this.setState({"game": game});
         }
-        // Render updated game state to canvas
+    },
+    renderCanvas: function(gameState){
         if(this.state.renderer == "canvas"){
-            this.state.gameRenderer.render(game);
+            this.state.gameRenderer.render(gameState);
         }
     },
     setGameMode: function(mode) {
