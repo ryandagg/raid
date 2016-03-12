@@ -3025,7 +3025,7 @@ module.exports = {
     GAMERUNNER_ANIMATION_FRAME_CNT: 24,
 
     /* Render Constants */
-    RENDER_WITH_CANVAS: true };
+    RENDER_WITH_CANVAS: false };
 
 },{}],48:[function(require,module,exports){
 var Actions = require('./Actions');
