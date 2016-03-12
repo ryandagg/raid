@@ -1,5 +1,7 @@
+// react
 var React = require('react');
 var ReactDOM = require('react-dom');
+var ReactMarkdown = require('react-markdown');
 
 // react bootstrap
 var Accordion = require('react-bootstrap').Accordion;
@@ -22,14 +24,15 @@ var brace  = require('brace');
 require('brace/mode/javascript');
 require('brace/theme/chrome');
 
-
+// game components
 var GameRunner = require('../lib/GameRunner');
 var ScoreEvent = require('../lib/ScoreEvent');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
 var GAReporter = require('../lib/GAReporter');
+var UnitType = require('../lib/UnitType');
 
-// Graphics
+// graphics
 var GraphicsConstants = require('../lib/Graphics/GraphicsConstants');
 var GameRenderer = require('../lib/Graphics/GameRenderer');
 
@@ -40,10 +43,8 @@ var ADVENTURE = "adventure";
 var TUTORIAL = "tutorial";
 
 
-
 var UnitStats = React.createClass({
     render: function() {
-        var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
             return (
                 <Well>
@@ -51,19 +52,13 @@ var UnitStats = React.createClass({
                 </Well>
             );
         }
-        if (this.props.unit.defeatPoints) {
-            scoreOrPointsLabel = "Value";
-            scoreOrPointsValue = this.props.unit.defeatPoints;
-        }
-        else {
-            scoreOrPointsLabel = "Score";
-            scoreOrPointsValue = this.props.score;
-        }
         return (
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
-                <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
+                {(this.props.unit.type != UnitType.PLAYER) ?
+                    <p>Value: {this.props.unit.defeatPoints}</p> : null
+                }
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
                 <p>Sight: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
@@ -579,18 +574,13 @@ var BetweenLevelContent = React.createClass({
         );
     },
     renderTutorial: function() {
-        var i = 0;
-        var lines = TutorialVerbage(this.props.level);
+        var source = TutorialVerbage(this.props.level);
         return (
             <Well>
                 <h3>{this.props.message}</h3>
-                {lines.map(function(line) {
-                    i++;
-                    return <p key={i}>{line}</p>;
-                })}
-                <br />
-                <p>Press Run to Continue</p>
-                <br />
+                <ReactMarkdown source={source} />
+                <p>Good luck!</p>
+                <p>Press <strong>Run</strong> to Continue</p>
             </Well>
         );
     }
