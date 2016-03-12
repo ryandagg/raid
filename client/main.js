@@ -33,6 +33,9 @@ var GAReporter = require('../lib/GAReporter');
 var GraphicsConstants = require('../lib/Graphics/GraphicsConstants');
 var GameRenderer = require('../lib/Graphics/GameRenderer');
 
+// Game constants
+var GameConstants = require('../lib/GameConstants');
+
 var ADVENTURE = "adventure";
 var TUTORIAL = "tutorial";
 
@@ -579,7 +582,7 @@ var BetweenLevelContent = React.createClass({
 
 var Raid = React.createClass({
     getInitialState: function() {
-        var gR = new GameRunner(this.renderUI, this.renderCanvas);
+        var gR = new GameRunner(this.renderUI, GameConstants.RENDER_WITH_CANVAS ? this.renderCanvas : null);
         var canvas = document.createElement('canvas');
         canvas.width = GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
         canvas.height = GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT;
@@ -590,7 +593,7 @@ var Raid = React.createClass({
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "canvas", // options: "canvas" or "table"
+            "renderer": GameConstants.RENDER_WITH_CANVAS ? "canvas" : "table",
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas),
             "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
