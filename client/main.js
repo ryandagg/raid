@@ -237,8 +237,21 @@ var TableRenderer = React.createClass({
 });
 
 var CanvasRenderer = React.createClass({
+    getInitialState: function() {
+        return {
+            zoomFactor: this.props.currentZoomFactor
+        };
+    },
     componentDidMount: function () {
         ReactDOM.findDOMNode(this).children[0].appendChild(this.props.canvas);
+    },
+    handleZoomIn: function() {
+        this.state.zoomFactor = Math.min(this.state.zoomFactor + 0.5, GraphicsConstants.FX_VIEWPORT_MAX_ZOOM_FACTOR);
+        this.props.setZoom(this.state.zoomFactor);
+    },
+    handleZoomOut: function() {
+        this.state.zoomFactor = Math.max(this.state.zoomFactor - 0.5, GraphicsConstants.FX_VIEWPORT_MIN_ZOOM_FACTOR);
+        this.props.setZoom(this.state.zoomFactor);
     },
     render: function() {
         var containerDivStyle = {
@@ -256,8 +269,12 @@ var CanvasRenderer = React.createClass({
         };
 
         return (
-            <div id="canvasContainer" style={containerDivStyle} >
-                <div style={stretchyDivStyle} />
+            <div id="canvasContainer" style={containerDivStyle}>
+                <div style={stretchyDivStyle}/>
+                <div id="canvasZoomButtonsContainer">
+                    <button id="zoomIn" onClick={this.handleZoomIn} className="zoomButton"></button>
+                    <button id="zoomOut" onClick={this.handleZoomOut} className="zoomButton"></button>
+                </div>
             </div>
             );
     }
@@ -595,6 +612,7 @@ var Raid = React.createClass({
             "message": "Welcome!",
             "renderer": GameConstants.RENDER_WITH_CANVAS ? "canvas" : "table",
             "canvas": canvas,
+            "currentZoomFactor": GraphicsConstants.FX_VIEWPORT_DEFAULT_ZOOM_FACTOR,
             "gameRenderer": new GameRenderer(canvas),
             "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
         }
@@ -661,9 +679,7 @@ var Raid = React.createClass({
         }
     },
     renderCanvas: function(gameState){
-        if(this.state.renderer == "canvas"){
-            this.state.gameRenderer.render(gameState);
-        }
+        this.state.gameRenderer.render(gameState);
     },
     setGameMode: function(mode) {
         GAReporter.startNewGame(mode);
@@ -671,6 +687,11 @@ var Raid = React.createClass({
     },
     setSpeed: function(speed) {
         this.state.gameRunner.setSpeed(speed);
+    },
+    setZoom: function(zoomFactor){
+        this.state.currentZoomFactor = zoomFactor;
+        this.state.gameRenderer.setZoom(this.state.currentZoomFactor);
+        this.renderCanvas(this.state.game);
     },
     render: function() {
         if (this.state.mode) {
@@ -725,7 +746,10 @@ var Raid = React.createClass({
             var renderer = null;
             if(this.state.renderer == "canvas"){
                 mainContent = (
-                        <CanvasRenderer canvas={this.state.canvas} />
+                        <CanvasRenderer 
+                            canvas={this.state.canvas}
+                            setZoom={this.setZoom}
+                            currentZoomFactor={this.state.currentZoomFactor} />
                     );
             }else{
                 mainContent = (
