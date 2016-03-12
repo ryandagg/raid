@@ -1,5 +1,7 @@
+// react
 var React = require('react');
 var ReactDOM = require('react-dom');
+var ReactMarkdown = require('react-markdown');
 
 // react bootstrap
 var Accordion = require('react-bootstrap').Accordion;
@@ -22,25 +24,27 @@ var brace  = require('brace');
 require('brace/mode/javascript');
 require('brace/theme/chrome');
 
-
+// game components
 var GameRunner = require('../lib/GameRunner');
 var ScoreEvent = require('../lib/ScoreEvent');
 var CompilePlayerCode = require('../lib/CompilePlayerCode');
 var TutorialVerbage = require('../lib/TutorialVerbage');
 var GAReporter = require('../lib/GAReporter');
+var UnitType = require('../lib/UnitType');
 
-// Graphics
+// graphics
 var GraphicsConstants = require('../lib/Graphics/GraphicsConstants');
 var GameRenderer = require('../lib/Graphics/GameRenderer');
+
+// Game constants
+var GameConstants = require('../lib/GameConstants');
 
 var ADVENTURE = "adventure";
 var TUTORIAL = "tutorial";
 
 
-
 var UnitStats = React.createClass({
     render: function() {
-        var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
             return (
                 <Well>
@@ -48,19 +52,13 @@ var UnitStats = React.createClass({
                 </Well>
             );
         }
-        if (this.props.unit.defeatPoints) {
-            scoreOrPointsLabel = "Value";
-            scoreOrPointsValue = this.props.unit.defeatPoints;
-        }
-        else {
-            scoreOrPointsLabel = "Score";
-            scoreOrPointsValue = this.props.score;
-        }
         return (
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
-                <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
+                {(this.props.unit.type != UnitType.PLAYER) ?
+                    <p>Value: {this.props.unit.defeatPoints}</p> : null
+                }
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
                 <p>Sight: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
@@ -234,12 +232,45 @@ var TableRenderer = React.createClass({
 });
 
 var CanvasRenderer = React.createClass({
+    getInitialState: function() {
+        return {
+            zoomFactor: this.props.currentZoomFactor
+        };
+    },
     componentDidMount: function () {
-        ReactDOM.findDOMNode(this).appendChild(this.props.canvas);
+        ReactDOM.findDOMNode(this).children[0].appendChild(this.props.canvas);
+    },
+    handleZoomIn: function() {
+        this.state.zoomFactor = Math.min(this.state.zoomFactor + 0.5, GraphicsConstants.FX_VIEWPORT_MAX_ZOOM_FACTOR);
+        this.props.setZoom(this.state.zoomFactor);
+    },
+    handleZoomOut: function() {
+        this.state.zoomFactor = Math.max(this.state.zoomFactor - 0.5, GraphicsConstants.FX_VIEWPORT_MIN_ZOOM_FACTOR);
+        this.props.setZoom(this.state.zoomFactor);
     },
     render: function() {
+        var containerDivStyle = {
+            width: "100%",
+            paddingBottom: "75%", //  Maintains 4:3 aspect ratio for the canvas
+            position: "relative"
+        };
+
+        var stretchyDivStyle = {
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
+
         return (
-            <div style={{marginBottom: 30 + 'px'}} />
+            <div id="canvasContainer" style={containerDivStyle}>
+                <div style={stretchyDivStyle}/>
+                <div id="canvasZoomButtonsContainer">
+                    <button id="zoomIn" onClick={this.handleZoomIn} className="zoomButton"></button>
+                    <button id="zoomOut" onClick={this.handleZoomOut} className="zoomButton"></button>
+                </div>
+            </div>
             );
     }
 });
@@ -543,18 +574,13 @@ var BetweenLevelContent = React.createClass({
         );
     },
     renderTutorial: function() {
-        var i = 0;
-        var lines = TutorialVerbage(this.props.level);
+        var source = TutorialVerbage(this.props.level);
         return (
             <Well>
                 <h3>{this.props.message}</h3>
-                {lines.map(function(line) {
-                    i++;
-                    return <p key={i}>{line}</p>;
-                })}
-                <br />
-                <p>Press Run to Continue</p>
-                <br />
+                <ReactMarkdown source={source} />
+                <p>Good luck!</p>
+                <p>Press <strong>Run</strong> to Continue</p>
             </Well>
         );
     }
@@ -563,19 +589,20 @@ var BetweenLevelContent = React.createClass({
 
 var Raid = React.createClass({
     getInitialState: function() {
-        var gR = new GameRunner(this.updateGame);
+        var gR = new GameRunner(this.renderUI, GameConstants.RENDER_WITH_CANVAS ? this.renderCanvas : null);
         var canvas = document.createElement('canvas');
-        var canvasWidth = this.getCanvasWidth();
-        canvas.width = canvasWidth;
-        canvas.height = canvasWidth * GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT /  GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
+        canvas.width = GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
+        canvas.height = GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT;
+        canvas.style.cssText = "width: 100%; height: 100%;";
         return {
             "gameRunner": gR,
             "game": null,
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "table", // options: "canvas" or "table"
+            "renderer": GameConstants.RENDER_WITH_CANVAS ? "canvas" : "table",
             "canvas": canvas,
+            "currentZoomFactor": GraphicsConstants.FX_VIEWPORT_DEFAULT_ZOOM_FACTOR,
             "gameRenderer": new GameRenderer(canvas),
             "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
         }
@@ -606,7 +633,7 @@ var Raid = React.createClass({
         this.setState({"game": this.state.gameRunner.game});
         this.state.gameRunner.play();
     },
-    updateGame: function(game) {
+    renderUI: function(game) {
         if (!this.state.game) {
             return;
         }
@@ -640,10 +667,9 @@ var Raid = React.createClass({
         } else {
             this.setState({"game": game});
         }
-        // Render updated game state to canvas
-        if(this.state.renderer == "canvas"){
-            this.state.gameRenderer.render(game);
-        }
+    },
+    renderCanvas: function(gameState){
+        this.state.gameRenderer.render(gameState);
     },
     setGameMode: function(mode) {
         GAReporter.startNewGame(mode);
@@ -651,6 +677,11 @@ var Raid = React.createClass({
     },
     setSpeed: function(speed) {
         this.state.gameRunner.setSpeed(speed);
+    },
+    setZoom: function(zoomFactor){
+        this.state.currentZoomFactor = zoomFactor;
+        this.state.gameRenderer.setZoom(this.state.currentZoomFactor);
+        this.renderCanvas(this.state.game);
     },
     render: function() {
         if (this.state.mode) {
@@ -705,7 +736,10 @@ var Raid = React.createClass({
             var renderer = null;
             if(this.state.renderer == "canvas"){
                 mainContent = (
-                        <CanvasRenderer canvas={this.state.canvas} />
+                        <CanvasRenderer 
+                            canvas={this.state.canvas}
+                            setZoom={this.setZoom}
+                            currentZoomFactor={this.state.currentZoomFactor} />
                     );
             }else{
                 mainContent = (
