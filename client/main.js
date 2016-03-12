@@ -552,7 +552,7 @@ var Raid = React.createClass({
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "canvas", // options: "canvas" or "table"
+            "renderer": "table", // options: "canvas" or "table"
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas),
             "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
