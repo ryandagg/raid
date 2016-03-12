@@ -4,7 +4,10 @@ var ReactDOM = require('react-dom');
 // react bootstrap
 var Accordion = require('react-bootstrap').Accordion;
 var Button = require('react-bootstrap').Button;
+var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
+var MenuItem = require('react-bootstrap').MenuItem;
+var DropdownButton = require('react-bootstrap').DropdownButton;
 var Grid = require('react-bootstrap').Grid;
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
@@ -39,7 +42,11 @@ var UnitStats = React.createClass({
     render: function() {
         var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
-            return (<p>No units in range</p>);
+            return (
+                <Well>
+                    <p>No units in range</p>
+                </Well>
+            );
         }
         if (this.props.unit.defeatPoints) {
             scoreOrPointsLabel = "Value";
@@ -55,14 +62,14 @@ var UnitStats = React.createClass({
                 <p>{this.props.unit.description}</p>
                 <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
-                <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
+                <p>Sight: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
         );
     }
 });
 
 
-var GameStats = React.createClass({
+var GameController = React.createClass({
     slow: function() {
         this.props.setSpeed(600);
     },
@@ -75,28 +82,58 @@ var GameStats = React.createClass({
     ultra: function() {
         this.props.setSpeed(75);
     },
+    compileAndRun: function() {
+        this.props.compile(this.props.playerCode);
+    },
     render: function() {
-        var playPause = (<ButtonGroup><Button onClick={this.props.pause}>Pause</Button></ButtonGroup>);
+        var mode = (this.props.mode === TUTORIAL ? "Tutorial" : "Adventure");
+        var playPause = (
+            <ButtonGroup>
+                <Button onClick={this.props.pause}>Pause</Button>
+                <Button onClick={this.compileAndRun} bsStyle="danger">Restart</Button>
+            </ButtonGroup>
+        );
         if (this.props.paused) {
             playPause = (
                 <ButtonGroup>
-                    <Button onClick={this.props.play}>Play</Button>
+                    <Button onClick={this.props.play}>Continue</Button>
                     <Button onClick={this.props.step}>Step</Button>
+                    <Button onClick={this.compileAndRun} bsStyle="danger">Restart</Button>
                 </ButtonGroup>
 
             );
         }
-        return (
+
+        var content = (
             <Well>
-                <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
-                {playPause}
-                <ButtonGroup>
-                    <Button onClick={this.slow}>.5x</Button>
-                    <Button onClick={this.normal}>1x</Button>
-                    <Button onClick={this.fast}>2x</Button>
-                    <Button onClick={this.ultra}>4x</Button>
-                </ButtonGroup>
+                <h3>{mode} Level: {this.props.level}</h3>
+                <h4>Score: {this.props.score}</h4>
+                <Button onClick={this.compileAndRun}>Run</Button>
             </Well>
+        );
+        if (this.props.game) {
+            content = (
+                <Well>
+                    <h3>{mode} Level: {this.props.level}</h3>
+                    <h4>Score: {this.props.score}</h4>
+                    <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
+                    <ButtonToolbar>
+                        {playPause}
+                        <DropdownButton title="Speed" id="bg-nested-dropdown">
+                            <MenuItem eventKey="1" onSelect={this.slow}>.5x</MenuItem>
+                            <MenuItem eventKey="2" onSelect={this.normal}>1x</MenuItem>
+                            <MenuItem eventKey="3" onSelect={this.fast}>2x</MenuItem>
+                            <MenuItem eventKey="4" onSelect={this.ultra}>4x</MenuItem>
+                        </DropdownButton>
+                    </ButtonToolbar>
+                </Well>
+            );
+        }
+
+        return (
+            <div>
+                {content}
+            </div>
         );
     }
 });
@@ -209,25 +246,27 @@ var CanvasRenderer = React.createClass({
 
 var samplePlayer = [
     "function RaidPlayer(playerController) {",
-    "   this.pc = playerController;",
+    "  this.pc = playerController;",
     "}",
     "",
     "RaidPlayer.prototype = {",
-    "   act: function() {",
-    "      if(this.pc.canMove(Direction.SOUTH)) {",
-    "        this.pc.move(Direction.SOUTH);",
-    "      }",
-    "   }",
+    "  act: function() {",
+    "    if(this.pc.canMove(Direction.SOUTH)) {",
+    "      this.pc.move(Direction.SOUTH);",
+    "      return;",
+    "    }",
+    "  }",
     "};"
 ];
 
 var PlayerCode = React.createClass({
     onPlayerUpdate: function(playerCode) {
+        localStorage.setItem("player", JSON.stringify(playerCode));
         this.setState({"player": playerCode});
     },
     getInitialState: function() {
         return {
-            "player": samplePlayer.join('\n')
+            "player": JSON.parse(localStorage.getItem("player")) || samplePlayer.join('\n')
         }
     },
     onPlayerRun: function() {
@@ -239,19 +278,18 @@ var PlayerCode = React.createClass({
             <form>
                 <Button onClick={this.onPlayerRun}>Run</Button>
                 <AceEditor
-                    mode="javascript"
-                    theme="chrome"
-                    ref="playerText"
+                    fontSize={12}
+                    highlightActiveLine={true}
                     label="RaidPlayer.js"
+                    maxLines={50}
+                    mode="javascript"
                     onChange={this.onPlayerUpdate}
+                    ref="playerText"
+                    showPrintMargin={false}
+                    tabSize={2}
+                    theme="chrome"
                     value={this.state.player}
                     width="100%"
-                    fontSize={14}
-                    maxLines={50}
-                    editorProps= {{
-                        $blockScrolling: true,
-                        $highlightActiveLine: true
-                    }}
                 />
             </form>
             )
@@ -276,25 +314,25 @@ var API = React.createClass({
                                 Moves the unit in direction d (adding delay). Throws an Error if that's not possible.
                             </Panel>
                             <Panel header="bool canHeal()" eventKey="19">
-                                Returns true if the unit can heal
+                                Returns true if the unit can heal. Your player will always return <code>true</code>.
                             </Panel>
                             <Panel header="heal()" eventKey="20">
-                                Heals the unit
+                                Heals the unit. Healing adds a lot to your delay.
                             </Panel>
-                            <Panel header="bool canMeleeAttack(Direction d)" eventKey="3">
-                                Returns true if the unit can attack that direction
+                            <Panel header="bool canMeleeAttack(MapLocation m)" eventKey="3">
+                                Returns true if the unit can attack that direction.
                             </Panel>
-                            <Panel header="meleeAttack(Direction d)" eventKey="4">
-                                Melee attacks in direction d
+                            <Panel header="meleeAttack(MapLocation m)" eventKey="4">
+                                Melee attacks at m.
                             </Panel>
                             <Panel header="bool canMagicAttack(MapLocation m)" eventKey="5">
-                                Returns true if the unit can attack that location
+                                Returns true if the unit can attack that location.
                             </Panel>
                             <Panel header="magicAttack(MapLocation m)" eventKey="6">
-                                Magic attacks at m. Magic attacks do splash damage to nearby squares
+                                Magic attacks at m. Magic attacks do splash damage to nearby squares.
                             </Panel>
                             <Panel header="bool canRangedAttack(MapLocation m)" eventKey="7">
-                                Returns true if the unit can range attack that location
+                                Returns true if the unit can range attack that location.
                             </Panel>
                             <Panel header="rangedAttack(MapLocation m)" eventKey="8">
                                 Range attacks at m. Ranged attack does big damage with large range but has a minimum range.
@@ -302,40 +340,43 @@ var API = React.createClass({
                             <Panel header="double getDelay()" eventKey="9">
                                 Get your player's current delay.
                             </Panel>
-                            <Panel header="MapLocation getCurrentLocation()" eventKey="10">
+                            <Panel header="UnitInfo getMyInfo()" eventKey="10">
+                                Get your player's current UnitInfo.
+                            </Panel>
+                            <Panel header="MapLocation getCurrentLocation()" eventKey="11">
                                 Get your player's current location.
                             </Panel>
-                            <Panel header="int getGameRound()" eventKey="11">
+                            <Panel header="int getGameRound()" eventKey="12">
                                 Get the current game round.
                             </Panel>
-                            <Panel header="int getGameRoundLimit()" eventKey="12">
+                            <Panel header="int getGameRoundLimit()" eventKey="13">
                                 Gets the game round limit.
                             </Panel>
-                            <Panel header="bool canSense(MapLocation m)" eventKey="13">
+                            <Panel header="bool canSense(MapLocation m)" eventKey="14">
                                 Returns true if m is in this units sensor range.
                             </Panel>
-                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="14">
+                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="15">
                                 Returns true if location m is a wall.
                             </Panel>
-                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="15">
+                            <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="16">
                                 Senses the unit at that location.
                             </Panel>
-                            <Panel header="UnitInfo[] senseNearbyUnits()" eventKey="16">
+                            <Panel header="UnitInfo[] senseNearbyUnits()" eventKey="17">
                                 Senses all units in sensorRange
                             </Panel>
-                            <Panel header="Direction senseDirectionToExit()" eventKey="17">
+                            <Panel header="Direction senseDirectionToExit()" eventKey="18">
                                 Senses the direction to the level exit;
                             </Panel>
-                            <Panel header="MapLocation senseExitLocIfClose()" eventKey="18">
+                            <Panel header="MapLocation senseExitLocIfClose()" eventKey="19">
                                 Senses the location of the exit if you are close enough;
                             </Panel>
 
                         </Accordion>
                     </Panel>
                     <Panel header="MapLocation" eventKey="2">
-                        <ul>
-                            <li>int x: the east/west coordinate (east (0) -> west (width))</li>
-                            <li>int y: the north/south cooredinate (north (0) -> south (height))</li>
+                        <ul className="list-unstyled">
+                            <li><code>x</code>: returns <code>int</code>, the east/west coordinate (east (0) -> west (width))</li>
+                            <li><code>y</code>: returns <code>int</code>, the north/south cooredinate (north (0) -> south (height))</li>
                         </ul>
                         <Accordion>
                             <Panel header="MapLocation add(Direction d)" eventKey="1">
@@ -359,12 +400,11 @@ var API = React.createClass({
                         </Accordion>
                     </Panel>
                     <Panel header="Direction" eventKey="3">
-                        <ul>
-                            <li>int x: the east/west component (east (-1) -> west (1))</li>
-                            <li>int y: the north/south component (north (-1) -> south (1))</li>
-                            <li>Direction.NORTH\SOUTH\EAST\WEST\NORTH_EAST\NORTH_WEST\SOUTH_EAST\SOUTH_WEST</li>
-                            <li>Direction.OMNI - returned when you are at a location and do directionTo that same location</li>
-                            <li>Direction.randomDirection() - returns a random direction (not including OMNI)</li>
+                        <ul className="list-unstyled">
+                            <li><code>x</code>: returns <code>int</code>, the east/west component (east (-1) -> west (1))</li>
+                            <li><code>y</code>: returns <code>int</code>, the north/south component (north (-1) -> south (1))</li>
+                            <li><code>Direction.NORTH\SOUTH\EAST\WEST\NORTH_EAST\NORTH_WEST\SOUTH_EAST\SOUTH_WEST</code></li>
+                            <li><code>Direction.OMNI</code> - returned when you are at a location and do directionTo that same location.</li>
                         </ul>
                         <Accordion>
                             <Panel header="bool equals(Direction d)" eventKey="1">
@@ -380,57 +420,60 @@ var API = React.createClass({
                                 Returns the opposite direction. Ie NORTH.opposite() -> SOUTH
                             </Panel>
                             <Panel header="bool isDiagonal()" eventKey="5">
-                                Returns true if this direction is not cardinal
+                                Returns true if this direction is not cardinal.
                             </Panel>
                             <Panel header="String toString()" eventKey="6">
-                                Returns the string representation of this direction
+                                Returns the string representation of this direction.
+                            </Panel>
+                            <Panel header="Direction randomDirection()" eventKey="6">
+                                Returns a random direction (not including OMNI).
                             </Panel>
                         </Accordion>
                     </Panel>
                     <Panel header="GameConstants" eventKey="4">
-                        (access through GameContants.VAR_NAME)
-                        <ul>
-                            <li>MIN_RANGED_ATTACK_RADIUS_SQUARED: 16,</li>
-                            <li>MAX_RANGED_ATTACK_RADIUS_SQUARED: 49,</li>
-                            <li>MAX_MAGIC_ATTACK_RADIUS_SQUARED: 36,</li>
-                            <li>MAGIC_ATTACK_SPLASH_PERCENTAGE: .25,</li>
-                            <li>MAX_MELEE_ATTACK_RADIUS_SQUARED: 2,</li>
-                            <li>SENSE_EXIT_THRESHOLD: 144,</li>
-                            <li>PLAYER_MOVE_DELAY: 2,</li>
-                            <li>PLAYER_HEAL_POWER: 5,</li>
-                            <li>PLAYER_HEAL_DELAY: 20,</li>
-                            <li>PLAYER_MELEE_POWER: 6,</li>
-                            <li>PLAYER_MELEE_DELAY: 2,</li>
-                            <li>PLAYER_MAGIC_POWER: 4,</li>
-                            <li>PLAYER_MAGIC_DELAY: 4,</li>
-                            <li>PLAYER_RANGED_POWER: 6,</li>
-                            <li>PLAYER_RANGED_DELAY: 3</li>
+                        <b>Access through GameContants.VAR_NAME</b>
+                        <ul className="list-unstyled">
+                            <li><code>MIN_RANGED_ATTACK_RADIUS_SQUARED</code>: 16,</li>
+                            <li><code>MAX_RANGED_ATTACK_RADIUS_SQUARED</code>: 49,</li>
+                            <li><code>MAX_MAGIC_ATTACK_RADIUS_SQUARED</code>: 36,</li>
+                            <li><code>MAGIC_ATTACK_SPLASH_PERCENTAGE</code>: .25,</li>
+                            <li><code>MAX_MELEE_ATTACK_RADIUS_SQUARED</code>: 2,</li>
+                            <li><code>SENSE_EXIT_THRESHOLD</code>: 144,</li>
+                            <li><code>PLAYER_MOVE_DELAY</code>: 2,</li>
+                            <li><code>PLAYER_HEAL_POWER</code>: 10,</li>
+                            <li><code>PLAYER_HEAL_DELAY</code>: 20,</li>
+                            <li><code>PLAYER_MELEE_POWER</code>: 20,</li>
+                            <li><code>PLAYER_MELEE_DELAY</code>: 2,</li>
+                            <li><code>PLAYER_MAGIC_POWER</code>: 16,</li>
+                            <li><code>PLAYER_MAGIC_DELAY</code>: 4,</li>
+                            <li><code>PLAYER_RANGED_POWER</code>: 18,</li>
+                            <li><code>PLAYER_RANGED_DELAY</code>: 3</li>
                         </ul>
                     </Panel>
                     <Panel header="UnitInfo" eventKey="5">
-                        (note values are static / don't update unless you sense again)
-                        <ul>
-                            <li>name - the name of the unit</li>
-                            <li>type - the symbol of the unit</li>
-                            <li>hp - the current hp of the unit</li>
-                            <li>maxHp - the maxHp of that unit</li>
-                            <li>canBeHealed - indicates if the unit can be healed</li>
-                            <li>location - the maplocation of the unit when you sensed it</li>
-                            <li>delay - the current delay of the unit (can't act until delay less than 1)</li>
-                            <li>movementDelay - the delay incurred by movement</li>
-                            <li>healPower - how much HP the unit can heal</li>
-                            <li>healDelay - how much delay is incurred by healing (0 if can't heal)</li>
-                            <li>meleeAttackPower - how much damage a melee attack does</li>
-                            <li>meleeAttackDelay - how much delay is incurred by melee attack (0 if can't attack)</li>
-                            <li>magicAttackPower - how much damage a magic attack does</li>
-                            <li>magicAttackDelay - how much delay is incurred by magic attack (0 if can't attack)</li>
-                            <li>rangedAttackPower - how much damage a ranged attack does</li>
-                            <li>rangedAttackDelay - how much delay is incurred by a ranged attack (0 if can't attack)</li>
-                            <li>sensorRadiusSquared - how far the unit can see</li>
-                            <li>alertRadiusSquared - once the unit sees you, it alerts nearby allies in this range</li>
-                            <li>spawnDelay - how many turns after spawning a unit this unit can spawn another</li>
-                            <li>currentSpawnDelay - how many turns until next unit is spawned</li>
-                            <li>spawnedUnitType - what type of unit will be spawned</li>
+                        <b>Values are static, check them again for new values</b>
+                        <ul className="list-unstyled">
+                            <li><code>name</code> the name of the unit.</li>
+                            <li><code>type</code> the symbol of the unit.</li>
+                            <li><code>hp</code> the current hp of the unit.</li>
+                            <li><code>maxHp</code> the maxHp of that unit.</li>
+                            <li><code>canBeHealed</code> indicates if the unit can be healed.</li>
+                            <li><code>location</code> the maplocation of the unit when you sensed it.</li>
+                            <li><code>delay</code> the current delay of the unit (can't act until delay less than 1).</li>
+                            <li><code>movementDelay</code> the delay incurred by movement.</li>
+                            <li><code>healPower</code> how much HP the unit can heal.</li>
+                            <li><code>healDelay</code> how much delay is incurred by healing (0 if can't heal).</li>
+                            <li><code>meleeAttackPower</code> how much damage a melee attack does.</li>
+                            <li><code>meleeAttackDelay</code> how much delay is incurred by melee attack (0 if can't attack).</li>
+                            <li><code>magicAttackPower</code> how much damage a magic attack does.</li>
+                            <li><code>magicAttackDelay</code> how much delay is incurred by magic attack (0 if can't attack).</li>
+                            <li><code>rangedAttackPower</code> how much damage a ranged attack does.</li>
+                            <li><code>rangedAttackDelay</code> how much delay is incurred by a ranged attack (0 if can't attack).</li>
+                            <li><code>sensorRadiusSquared</code> how far the unit can see.</li>
+                            <li><code>alertRadiusSquared</code> once the unit sees you, it alerts nearby allies in this range.</li>
+                            <li><code>spawnDelay</code> how many turns after spawning a unit this unit can spawn another.</li>
+                            <li><code>currentSpawnDelay</code> how many turns until next unit is spawned.</li>
+                            <li><code>spawnedUnitType</code> what type of unit will be spawned.</li>
                         </ul>
                     </Panel>
                 </Accordion>
@@ -449,13 +492,32 @@ var SplashScreen = React.createClass({
         this.props.setGameMode(TUTORIAL);
     },
     render: function() {
+        var titleStyle = {fontSize: "400px",
+                        lineHeight: "350px",
+                        width: "100%"
+                        };
         return (
-            <Well>
-                <h1>Welcome to Rogue AI Dungeon!</h1>
+            <div>
+                <div className="text-center">
+                    <span style={titleStyle}>@</span><br />
+                    <h1>Welcome to <code>Rogue AI Dungeon!</code></h1>
+                </div>
                 <br />
-                <Button onClick={this.setTutorial}>Tutorial</Button>
-                <Button onClick={this.setAdventure}>Adventure</Button>
-            </Well>
+                <div className="container lead">
+                    <div className="col-md-8 col-md-offset-2">
+                        Far fields. Many dungeons. Much monsters. And let's not forget <code>javascript</code>! This
+                        is a code-your-own-adventure take on a classic game. How far can you get?
+                        <br />
+                        <br />
+                        <div className="text-center">
+                            <ButtonToolbar>
+                                <Button onClick={this.setTutorial} className="btn-lg">Tutorial</Button>
+                                <Button onClick={this.setAdventure} className="btn-lg">Adventure</Button>
+                            </ButtonToolbar>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
 });
@@ -473,8 +535,6 @@ var BetweenLevelContent = React.createClass({
     renderAdventure: function() {
         return (
             <Well>
-                <h3>Adventure Level: {this.props.level}</h3>
-                <p>Score: {this.props.score}</p>
                 <p>{this.props.message}</p>
                 <br />
                 <p>Press Run to Continue</p>
@@ -484,12 +544,10 @@ var BetweenLevelContent = React.createClass({
     },
     renderTutorial: function() {
         var i = 0;
-        lines = TutorialVerbage(this.props.level);
+        var lines = TutorialVerbage(this.props.level);
         return (
             <Well>
-                <h3>Tutorial Level: {this.props.level}</h3>
-                <h4>Score: {this.props.score}</h4>
-                <p><b>{this.props.message}</b></p>
+                <h3>{this.props.message}</h3>
                 {lines.map(function(line) {
                     i++;
                     return <p key={i}>{line}</p>;
@@ -518,8 +576,13 @@ var Raid = React.createClass({
             "message": "Welcome!",
             "renderer": "table", // options: "canvas" or "table"
             "canvas": canvas,
-            "gameRenderer": new GameRenderer(canvas)
+            "gameRenderer": new GameRenderer(canvas),
+            "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
         }
+    },
+    onPlayerCodeUpdate: function(playerCode) {
+        localStorage.setItem("playerCode", JSON.stringify(playerCode));
+        this.setState({"playerCode": playerCode});
     },
     compileAndStart: function(playerCode) {
         var playerCreator = CompilePlayerCode(playerCode);
@@ -531,7 +594,7 @@ var Raid = React.createClass({
         w = Math.min(1107, w);
         var canvasWidth = w;
         if (w > 1000) {
-            canvasWidth = .75 * .9 * w;
+            canvasWidth = 652; /* Based on min width for containing col-lg-7 */
         } else {
             canvasWidth *= .85;
         }
@@ -607,13 +670,26 @@ var Raid = React.createClass({
     },
     renderGame: function() {
         var score = this.state.finalScore || this.state.gameRunner.scoreManager.getScore();
-        var content = (
+        var mainContent = (
             <BetweenLevelContent
                 level={this.state.level}
                 mode={this.state.mode}
                 message={this.state.message}
-                score={score}
-            />);
+            />
+        );
+        var sideContent = (
+            <Row>
+                <Col lg={12} md={12} xs={12}>
+                    <GameController
+                        level={this.state.level}
+                        mode={this.state.mode}
+                        score={score}
+                        compile={this.compileAndStart}
+                        playerCode={this.state.playerCode}
+                    />
+                </Col>
+            </Row>
+        );
         if (this.state.game) {
             var nearbyUnits = this.state.game.player.player.pc.senseNearbyUnits();
             var closestUnit = null;
@@ -628,11 +704,11 @@ var Raid = React.createClass({
             // Setup renderer
             var renderer = null;
             if(this.state.renderer == "canvas"){
-                renderer = (
+                mainContent = (
                         <CanvasRenderer canvas={this.state.canvas} />
                     );
             }else{
-                renderer = (
+                mainContent = (
                         <TableRenderer
                             width={this.state.game.map.width}
                             height={this.state.game.map.height}
@@ -645,43 +721,61 @@ var Raid = React.createClass({
                             />
                     );
             }
-            content = (
+            sideContent = (
                 <Row>
-                    <Col xs={12} md={9}>
-                        {renderer}
+                    <Col lg={12} md={4} xs={12}>
+                        <GameController
+                            level={this.state.level}
+                            mode={this.state.mode}
+                            score={score}
+                            setSpeed={this.setSpeed}
+                            game={this.state.game}
+                            paused={this.state.gameRunner.paused}
+                            play={this.play}
+                            pause={this.pause}
+                            step={this.step}
+                            compile={this.compileAndStart}
+                            playerCode={this.state.playerCode}
+                        />
                     </Col>
-                    <Col xs={12} md={3}>
-                        <Row>
-                            <Col xs={4} md={12}>
-                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
-                            </Col>
-                            <Col xs={4} md={12}>
-                                <UnitStats unit={closestUnit} />
-                            </Col>
-                            <Col xs={4} md={12}>
-                                <GameStats
-                                    setSpeed={this.setSpeed}
-                                    game={this.state.game}
-                                    paused={this.state.gameRunner.paused}
-                                    play={this.play}
-                                    pause={this.pause}
-                                    step={this.step}
-                                />
-                            </Col>
-                        </Row>
+                    <Col lg={6} md={4} xs={6}>
+                        <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
+                    </Col>
+                    <Col lg={6} md={4} xs={6}>
+                        <UnitStats unit={closestUnit} />
                     </Col>
                 </Row>
             );
         }
         return (
             <Grid>
-                {content}
+                <Row>
+                    <Col lg={7} md={12} xs={12}>
+                        {mainContent}
+                    </Col>
+                    <Col lg={5} md={12} xs={12}>
+                        {sideContent}
+                    </Col>
+                </Row>
 
                 <Row>
-                    <Col xs={12} md={12} lg={7}>
-                        <PlayerCode compileAndStart={this.compileAndStart}/>
+                    <Col xs={12} md={7} lg={7}>
+                        <AceEditor
+                            fontSize={12}
+                            highlightActiveLine={true}
+                            label="RaidPlayer.js"
+                            maxLines={50}
+                            mode="javascript"
+                            onChange={this.onPlayerCodeUpdate}
+                            ref="playerText"
+                            showPrintMargin={false}
+                            tabSize={2}
+                            theme="chrome"
+                            value={this.state.playerCode}
+                            width="100%"
+                        />
                     </Col>
-                    <Col xs={12} md={12} lg={5}>
+                    <Col xs={12} md={5} lg={5}>
                         <API />
                     </Col>
                 </Row>
