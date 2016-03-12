@@ -7,6 +7,16 @@
     color: #000000;
 }
 
+#canvasContainer{
+    margin-bottom: 30px;
+}
+
+@media (max-width: 992px){
+    #canvasContainer{
+        margin-bottom: 15px;
+    }
+}
+
 .tile {
     /* border: 1px solid #000000; */
     text-align: center;

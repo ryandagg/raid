@@ -235,11 +235,27 @@ var TableRenderer = React.createClass({
 
 var CanvasRenderer = React.createClass({
     componentDidMount: function () {
-        ReactDOM.findDOMNode(this).appendChild(this.props.canvas);
+        ReactDOM.findDOMNode(this).children[0].appendChild(this.props.canvas);
     },
     render: function() {
+        var containerDivStyle = {
+            width: "100%",
+            paddingBottom: "75%", //  Maintains 4:3 aspect ratio for the canvas
+            position: "relative"
+        };
+
+        var stretchyDivStyle = {
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
+
         return (
-            <div style={{marginBottom: 30 + 'px'}} />
+            <div id="canvasContainer" style={containerDivStyle} >
+                <div style={stretchyDivStyle} />
+            </div>
             );
     }
 });
@@ -565,16 +581,16 @@ var Raid = React.createClass({
     getInitialState: function() {
         var gR = new GameRunner(this.updateGame);
         var canvas = document.createElement('canvas');
-        var canvasWidth = this.getCanvasWidth();
-        canvas.width = canvasWidth;
-        canvas.height = canvasWidth * GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT /  GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
+        canvas.width = GraphicsConstants.FX_VIEWPORT_CANVAS_WIDTH;
+        canvas.height = GraphicsConstants.FX_VIEWPORT_CANVAS_HEIGHT;
+        canvas.style.cssText = "width: 100%; height: 100%;";
         return {
             "gameRunner": gR,
             "game": null,
             "mode": null,
             "level": 1,
             "message": "Welcome!",
-            "renderer": "table", // options: "canvas" or "table"
+            "renderer": "canvas", // options: "canvas" or "table"
             "canvas": canvas,
             "gameRenderer": new GameRenderer(canvas),
             "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
