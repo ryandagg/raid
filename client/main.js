@@ -545,7 +545,6 @@ var Raid = React.createClass({
         this.startGame();
     },
     getCanvasWidth: function() {
-        console.log(window.innerWidth);
         var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         w = Math.min(1107, w);
         var canvasWidth = w;
