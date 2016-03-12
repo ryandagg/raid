@@ -510,8 +510,10 @@ var SplashScreen = React.createClass({
                         <br />
                         <br />
                         <div className="text-center">
-                            <Button onClick={this.setTutorial} className="btn-lg">Tutorial</Button>
-                            <Button onClick={this.setAdventure} className="btn-lg">Adventure</Button>
+                            <ButtonToolbar>
+                                <Button onClick={this.setTutorial} className="btn-lg">Tutorial</Button>
+                                <Button onClick={this.setAdventure} className="btn-lg">Adventure</Button>
+                            </ButtonToolbar>
                         </div>
                     </div>
                 </div>
