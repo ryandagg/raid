@@ -86,6 +86,7 @@ var GameController = React.createClass({
         this.props.compile(this.props.playerCode);
     },
     render: function() {
+        var mode = (this.props.mode === TUTORIAL ? "Tutorial" : "Adventure");
         var playPause = (
             <ButtonGroup>
                 <Button onClick={this.props.pause}>Pause</Button>
@@ -105,7 +106,7 @@ var GameController = React.createClass({
 
         var content = (
             <Well>
-                <h3>Tutorial Level: {this.props.level}</h3>
+                <h3>{mode} Level: {this.props.level}</h3>
                 <h4>Score: {this.props.score}</h4>
                 <Button onClick={this.compileAndRun}>Run</Button>
             </Well>
@@ -113,7 +114,7 @@ var GameController = React.createClass({
         if (this.props.game) {
             content = (
                 <Well>
-                    <h3>Tutorial Level: {this.props.level}</h3>
+                    <h3>{mode} Level: {this.props.level}</h3>
                     <h4>Score: {this.props.score}</h4>
                     <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
                     <ButtonToolbar>
