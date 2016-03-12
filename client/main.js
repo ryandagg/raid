@@ -4,7 +4,10 @@ var ReactDOM = require('react-dom');
 // react bootstrap
 var Accordion = require('react-bootstrap').Accordion;
 var Button = require('react-bootstrap').Button;
+var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
+var MenuItem = require('react-bootstrap').MenuItem;
+var DropdownButton = require('react-bootstrap').DropdownButton;
 var Grid = require('react-bootstrap').Grid;
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
@@ -39,7 +42,11 @@ var UnitStats = React.createClass({
     render: function() {
         var scoreOrPointsLabel, scoreOrPointsValue;
         if (!this.props.unit) {
-            return (<p>No units in range</p>);
+            return (
+                <Well>
+                    <p>No units in range</p>
+                </Well>
+            );
         }
         if (this.props.unit.defeatPoints) {
             scoreOrPointsLabel = "Value";
@@ -55,14 +62,14 @@ var UnitStats = React.createClass({
                 <p>{this.props.unit.description}</p>
                 <p>{scoreOrPointsLabel}: {scoreOrPointsValue}</p>
                 <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
-                <p>SightRadiusSquared: {this.props.unit.sensorRadiusSquared}</p>
+                <p>Sight: {this.props.unit.sensorRadiusSquared}</p>
             </Well>
         );
     }
 });
 
 
-var GameStats = React.createClass({
+var GameController = React.createClass({
     slow: function() {
         this.props.setSpeed(600);
     },
@@ -75,28 +82,57 @@ var GameStats = React.createClass({
     ultra: function() {
         this.props.setSpeed(75);
     },
+    compileAndRun: function() {
+        this.props.compile(this.props.playerCode);
+    },
     render: function() {
-        var playPause = (<ButtonGroup><Button onClick={this.props.pause}>Pause</Button></ButtonGroup>);
+        var playPause = (
+            <ButtonGroup>
+                <Button onClick={this.props.pause}>Pause</Button>
+                <Button onClick={this.compileAndRun} bsStyle="danger">Restart</Button>
+            </ButtonGroup>
+        );
         if (this.props.paused) {
             playPause = (
                 <ButtonGroup>
-                    <Button onClick={this.props.play}>Play</Button>
+                    <Button onClick={this.props.play}>Continue</Button>
                     <Button onClick={this.props.step}>Step</Button>
+                    <Button onClick={this.compileAndRun} bsStyle="danger">Restart</Button>
                 </ButtonGroup>
 
             );
         }
-        return (
+
+        var content = (
             <Well>
-                <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
-                {playPause}
-                <ButtonGroup>
-                    <Button onClick={this.slow}>.5x</Button>
-                    <Button onClick={this.normal}>1x</Button>
-                    <Button onClick={this.fast}>2x</Button>
-                    <Button onClick={this.ultra}>4x</Button>
-                </ButtonGroup>
+                <h3>Tutorial Level: {this.props.level}</h3>
+                <h4>Score: {this.props.score}</h4>
+                <Button onClick={this.compileAndRun}>Run</Button>
             </Well>
+        );
+        if (this.props.game) {
+            content = (
+                <Well>
+                    <h3>Tutorial Level: {this.props.level}</h3>
+                    <h4>Score: {this.props.score}</h4>
+                    <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
+                    <ButtonToolbar>
+                        {playPause}
+                        <DropdownButton title="Speed" id="bg-nested-dropdown">
+                            <MenuItem eventKey="1" onSelect={this.slow}>.5x</MenuItem>
+                            <MenuItem eventKey="2" onSelect={this.normal}>1x</MenuItem>
+                            <MenuItem eventKey="3" onSelect={this.fast}>2x</MenuItem>
+                            <MenuItem eventKey="4" onSelect={this.ultra}>4x</MenuItem>
+                        </DropdownButton>
+                    </ButtonToolbar>
+                </Well>
+            );
+        }
+
+        return (
+            <div>
+                {content}
+            </div>
         );
     }
 });
@@ -209,16 +245,16 @@ var CanvasRenderer = React.createClass({
 
 var samplePlayer = [
     "function RaidPlayer(playerController) {",
-    "   this.pc = playerController;",
+    "  this.pc = playerController;",
     "}",
     "",
     "RaidPlayer.prototype = {",
-    "   act: function() {",
-    "       if(this.pc.canMove(Direction.SOUTH)) {",
-    "           this.pc.move(Direction.SOUTH);",
-    "           return;",
-    "       }",
-    "   }",
+    "  act: function() {",
+    "    if(this.pc.canMove(Direction.SOUTH)) {",
+    "      this.pc.move(Direction.SOUTH);",
+    "      return;",
+    "    }",
+    "  }",
     "};"
 ];
 
@@ -241,19 +277,18 @@ var PlayerCode = React.createClass({
             <form>
                 <Button onClick={this.onPlayerRun}>Run</Button>
                 <AceEditor
-                    mode="javascript"
-                    theme="chrome"
-                    ref="playerText"
+                    fontSize={12}
+                    highlightActiveLine={true}
                     label="RaidPlayer.js"
+                    maxLines={50}
+                    mode="javascript"
                     onChange={this.onPlayerUpdate}
+                    ref="playerText"
+                    showPrintMargin={false}
+                    tabSize={2}
+                    theme="chrome"
                     value={this.state.player}
                     width="100%"
-                    fontSize={14}
-                    maxLines={50}
-                    editorProps= {{
-                        $blockScrolling: true,
-                        $highlightActiveLine: true
-                    }}
                 />
             </form>
             )
@@ -475,8 +510,6 @@ var BetweenLevelContent = React.createClass({
     renderAdventure: function() {
         return (
             <Well>
-                <h3>Adventure Level: {this.props.level}</h3>
-                <p>Score: {this.props.score}</p>
                 <p>{this.props.message}</p>
                 <br />
                 <p>Press Run to Continue</p>
@@ -486,12 +519,10 @@ var BetweenLevelContent = React.createClass({
     },
     renderTutorial: function() {
         var i = 0;
-        lines = TutorialVerbage(this.props.level);
+        var lines = TutorialVerbage(this.props.level);
         return (
             <Well>
-                <h3>Tutorial Level: {this.props.level}</h3>
-                <h4>Score: {this.props.score}</h4>
-                <p><b>{this.props.message}</b></p>
+                <h3>{this.props.message}</h3>
                 {lines.map(function(line) {
                     i++;
                     return <p key={i}>{line}</p>;
@@ -520,8 +551,13 @@ var Raid = React.createClass({
             "message": "Welcome!",
             "renderer": "canvas", // options: "canvas" or "table"
             "canvas": canvas,
-            "gameRenderer": new GameRenderer(canvas)
+            "gameRenderer": new GameRenderer(canvas),
+            "playerCode": JSON.parse(localStorage.getItem("playerCode")) || samplePlayer.join('\n')
         }
+    },
+    onPlayerCodeUpdate: function(playerCode) {
+        localStorage.setItem("playerCode", JSON.stringify(playerCode));
+        this.setState({"playerCode": playerCode});
     },
     compileAndStart: function(playerCode) {
         var playerCreator = CompilePlayerCode(playerCode);
@@ -533,7 +569,7 @@ var Raid = React.createClass({
         w = Math.min(1107, w);
         var canvasWidth = w;
         if (w > 1000) {
-            canvasWidth = .75 * .9 * w;
+            canvasWidth = 652; /* Based on min width for containing col-lg-7 */
         } else {
             canvasWidth *= .85;
         }
@@ -609,13 +645,26 @@ var Raid = React.createClass({
     },
     renderGame: function() {
         var score = this.state.finalScore || this.state.gameRunner.scoreManager.getScore();
-        var content = (
+        var mainContent = (
             <BetweenLevelContent
                 level={this.state.level}
                 mode={this.state.mode}
                 message={this.state.message}
-                score={score}
-            />);
+            />
+        );
+        var sideContent = (
+            <Row>
+                <Col lg={12} md={12} xs={12}>
+                    <GameController
+                        level={this.state.level}
+                        mode={this.state.mode}
+                        score={score}
+                        compile={this.compileAndStart}
+                        playerCode={this.state.playerCode}
+                    />
+                </Col>
+            </Row>
+        );
         if (this.state.game) {
             var nearbyUnits = this.state.game.player.player.pc.senseNearbyUnits();
             var closestUnit = null;
@@ -630,11 +679,11 @@ var Raid = React.createClass({
             // Setup renderer
             var renderer = null;
             if(this.state.renderer == "canvas"){
-                renderer = (
+                mainContent = (
                         <CanvasRenderer canvas={this.state.canvas} />
                     );
             }else{
-                renderer = (
+                mainContent = (
                         <TableRenderer
                             width={this.state.game.map.width}
                             height={this.state.game.map.height}
@@ -647,43 +696,61 @@ var Raid = React.createClass({
                             />
                     );
             }
-            content = (
+            sideContent = (
                 <Row>
-                    <Col xs={12} md={9}>
-                        {renderer}
+                    <Col lg={12} md={4} xs={12}>
+                        <GameController
+                            level={this.state.level}
+                            mode={this.state.mode}
+                            score={score}
+                            setSpeed={this.setSpeed}
+                            game={this.state.game}
+                            paused={this.state.gameRunner.paused}
+                            play={this.play}
+                            pause={this.pause}
+                            step={this.step}
+                            compile={this.compileAndStart}
+                            playerCode={this.state.playerCode}
+                        />
                     </Col>
-                    <Col xs={12} md={3}>
-                        <Row>
-                            <Col xs={4} md={12}>
-                                <GameStats
-                                    setSpeed={this.setSpeed}
-                                    game={this.state.game}
-                                    paused={this.state.gameRunner.paused}
-                                    play={this.play}
-                                    pause={this.pause}
-                                    step={this.step}
-                                />
-                            </Col>
-                            <Col xs={4} md={12}>
-                                <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
-                            </Col>
-                            <Col xs={4} md={12}>
-                                <UnitStats unit={closestUnit} />
-                            </Col>
-                        </Row>
+                    <Col lg={6} md={4} xs={6}>
+                        <UnitStats unit={this.state.game.player} score={this.state.gameRunner.getScore()} />
+                    </Col>
+                    <Col lg={6} md={4} xs={6}>
+                        <UnitStats unit={closestUnit} />
                     </Col>
                 </Row>
             );
         }
         return (
             <Grid>
-                {content}
+                <Row>
+                    <Col lg={7} md={12} xs={12}>
+                        {mainContent}
+                    </Col>
+                    <Col lg={5} md={12} xs={12}>
+                        {sideContent}
+                    </Col>
+                </Row>
 
                 <Row>
-                    <Col xs={12} md={12} lg={7}>
-                        <PlayerCode compileAndStart={this.compileAndStart}/>
+                    <Col xs={12} md={7} lg={7}>
+                        <AceEditor
+                            fontSize={12}
+                            highlightActiveLine={true}
+                            label="RaidPlayer.js"
+                            maxLines={50}
+                            mode="javascript"
+                            onChange={this.onPlayerCodeUpdate}
+                            ref="playerText"
+                            showPrintMargin={false}
+                            tabSize={2}
+                            theme="chrome"
+                            value={this.state.playerCode}
+                            width="100%"
+                        />
                     </Col>
-                    <Col xs={12} md={12} lg={5}>
+                    <Col xs={12} md={5} lg={5}>
                         <API />
                     </Col>
                 </Row>
