@@ -461,7 +461,7 @@ var API = React.createClass({
                             <Panel header="String toString()" eventKey="6">
                                 Returns the string representation of this direction.
                             </Panel>
-                            <Panel header="Direction randomDirection()" eventKey="6">
+                            <Panel header="Direction randomDirection()" eventKey="7">
                                 Returns a random direction (not including OMNI).
                             </Panel>
                         </Accordion>
