@@ -118,7 +118,7 @@ var GameController = React.createClass({
             content = (
                 <Well>
                     <h3>{mode} Level: {this.props.level}</h3>
-                    <h4>Score: {this.props.score}</h4>
+                    <h4>Score: {Math.round(this.props.score)}</h4>
                     <p>Round: {this.props.game.round}/{this.props.game.map.roundLimit}</p>
                     <ButtonToolbar>
                         {playPause}
@@ -471,7 +471,7 @@ var API = React.createClass({
                         <ul className="list-unstyled">
                             <li><code>MIN_RANGED_ATTACK_RADIUS_SQUARED</code>: 16</li>
                             <li><code>MAX_RANGED_ATTACK_RADIUS_SQUARED</code>: 49</li>
-                            <li><code>MAX_MAGIC_ATTACK_RADIUS_SQUARED</code>: 16</li>
+                            <li><code>MAX_MAGIC_ATTACK_RADIUS_SQUARED</code>: 25</li>
                             <li><code>MAGIC_ATTACK_SPLASH_PERCENTAGE</code>: .75</li>
                             <li><code>MAX_MELEE_ATTACK_RADIUS_SQUARED</code>: 2</li>
                             <li><code>SENSE_EXIT_THRESHOLD</code>: 144</li>
