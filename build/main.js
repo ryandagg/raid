@@ -770,7 +770,7 @@ var API = React.createClass({
                         ),
                         React.createElement(
                             Panel,
-                            { header: 'Direction randomDirection()', eventKey: '6' },
+                            { header: 'Direction randomDirection()', eventKey: '7' },
                             'Returns a random direction (not including OMNI).'
                         )
                     )
