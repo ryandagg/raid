@@ -56,11 +56,16 @@ var UnitStats = React.createClass({
             <Well>
                 <p>{this.props.unit.name}: {this.props.unit.type}   {this.props.unit.hp}/{this.props.unit.maxHp}</p>
                 <p>{this.props.unit.description}</p>
+                <ul>
                 {(this.props.unit.type != UnitType.PLAYER) ?
-                    <p>Value: {this.props.unit.defeatPoints}</p> : null
+                    <li>Value: {Math.round(this.props.unit.defeatPoints)}</li> : null
                 }
-                <p>Delay: {Math.round(100 * this.props.unit.delay) / 100}</p>
-                <p>Sight: {this.props.unit.sensorRadiusSquared}</p>
+                <li>Delay: {Math.round(100 * this.props.unit.delay) / 100}</li>
+                <li>Sight: {this.props.unit.sensorRadiusSquared}</li>
+                <li>Melee: {this.props.unit.meleeAttackPower} / {this.props.unit.meleeAttackDelay}</li>
+                <li>Magic: {this.props.unit.magicAttackPower} / {this.props.unit.magicAttackDelay}</li>
+                <li>Ranged: {this.props.unit.rangedAttackPower} / {this.props.unit.rangedAttackDelay}</li>
+                    </ul>
             </Well>
         );
     }
@@ -105,7 +110,7 @@ var GameController = React.createClass({
         var content = (
             <Well>
                 <h3>{mode} Level: {this.props.level}</h3>
-                <h4>Score: {this.props.score}</h4>
+                <h4>Score: {Math.round(this.props.score)}</h4>
                 <Button onClick={this.compileAndRun}>Run</Button>
             </Well>
         );
@@ -464,20 +469,20 @@ var API = React.createClass({
                     <Panel header="GameConstants" eventKey="4">
                         <b>Access through GameContants.VAR_NAME</b>
                         <ul className="list-unstyled">
-                            <li><code>MIN_RANGED_ATTACK_RADIUS_SQUARED</code>: 16,</li>
-                            <li><code>MAX_RANGED_ATTACK_RADIUS_SQUARED</code>: 49,</li>
-                            <li><code>MAX_MAGIC_ATTACK_RADIUS_SQUARED</code>: 36,</li>
-                            <li><code>MAGIC_ATTACK_SPLASH_PERCENTAGE</code>: .25,</li>
-                            <li><code>MAX_MELEE_ATTACK_RADIUS_SQUARED</code>: 2,</li>
-                            <li><code>SENSE_EXIT_THRESHOLD</code>: 144,</li>
-                            <li><code>PLAYER_MOVE_DELAY</code>: 2,</li>
-                            <li><code>PLAYER_HEAL_POWER</code>: 10,</li>
-                            <li><code>PLAYER_HEAL_DELAY</code>: 20,</li>
-                            <li><code>PLAYER_MELEE_POWER</code>: 20,</li>
-                            <li><code>PLAYER_MELEE_DELAY</code>: 2,</li>
-                            <li><code>PLAYER_MAGIC_POWER</code>: 16,</li>
-                            <li><code>PLAYER_MAGIC_DELAY</code>: 4,</li>
-                            <li><code>PLAYER_RANGED_POWER</code>: 18,</li>
+                            <li><code>MIN_RANGED_ATTACK_RADIUS_SQUARED</code>: 16</li>
+                            <li><code>MAX_RANGED_ATTACK_RADIUS_SQUARED</code>: 49</li>
+                            <li><code>MAX_MAGIC_ATTACK_RADIUS_SQUARED</code>: 16</li>
+                            <li><code>MAGIC_ATTACK_SPLASH_PERCENTAGE</code>: .75</li>
+                            <li><code>MAX_MELEE_ATTACK_RADIUS_SQUARED</code>: 2</li>
+                            <li><code>SENSE_EXIT_THRESHOLD</code>: 144</li>
+                            <li><code>PLAYER_MOVE_DELAY</code>: 2</li>
+                            <li><code>PLAYER_HEAL_POWER</code>: 10</li>
+                            <li><code>PLAYER_HEAL_DELAY</code>: 20</li>
+                            <li><code>PLAYER_MELEE_POWER</code>: 20</li>
+                            <li><code>PLAYER_MELEE_DELAY</code>: 2</li>
+                            <li><code>PLAYER_MAGIC_POWER</code>: 8</li>
+                            <li><code>PLAYER_MAGIC_DELAY</code>: 4</li>
+                            <li><code>PLAYER_RANGED_POWER</code>: 18</li>
                             <li><code>PLAYER_RANGED_DELAY</code>: 3</li>
                         </ul>
                     </Panel>
