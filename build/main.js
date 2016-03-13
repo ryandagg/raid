@@ -220,7 +220,7 @@ var GameController = React.createClass({
                     'h4',
                     null,
                     'Score: ',
-                    this.props.score
+                    Math.round(this.props.score)
                 ),
                 React.createElement(
                     'p',
@@ -814,7 +814,7 @@ var API = React.createClass({
                                 null,
                                 'MAX_MAGIC_ATTACK_RADIUS_SQUARED'
                             ),
-                            ': 16'
+                            ': 25'
                         ),
                         React.createElement(
                             'li',
@@ -1582,6 +1582,7 @@ var UnitController = require('./UnitController');
 var GameController = require('./GameController');
 var Direction = require('./GameObjects/Direction');
 var Pathfinder = require('./Utils/Pathfinder');
+var Team = require('./Team');
 
 function CreepController(id) {
     // make this read only
@@ -1660,9 +1661,13 @@ CreepController.prototype.senseDirectionToExit = function () {
     return this.gc.senseDirectionToExit(this.id);
 };
 
+CreepController.prototype.senseCreeps = function () {
+    return this.gc.senseNearbyUnits(this.id, { "team": Team.CREEP });
+};
+
 module.exports = CreepController;
 
-},{"./GameController":49,"./GameObjects/Direction":50,"./UnitController":86,"./Utils/Pathfinder":92}],5:[function(require,module,exports){
+},{"./GameController":49,"./GameObjects/Direction":50,"./Team":83,"./UnitController":86,"./Utils/Pathfinder":92}],5:[function(require,module,exports){
 
 function BaseCreepPlayer(creepController) {
     this.cc = creepController;
@@ -1864,7 +1869,7 @@ KiteWithFriendDumb.prototype.act = function () {
     var toPlayer = ourLoc.directionTo(playerLoc);
     var distSqToPlayer = ourLoc.distanceSquaredTo(playerLoc);
 
-    var friendNearby = this.cc.senseNearbyUnitsFromTeam().length > 0;
+    var friendNearby = this.cc.senseNearbyUnitsFromTeam(this.cc.getSelfInfo().team).length > 0;
 
     if (friendNearby) {
         if (this.cc.canRangedAttack(playerLoc)) {
@@ -3070,7 +3075,7 @@ Object.defineProperties(GameConstants, {
     /* Attack constants */
     MIN_RANGED_ATTACK_RADIUS_SQUARED: { value: 16, writeable: false },
     MAX_RANGED_ATTACK_RADIUS_SQUARED: { value: 49, writeable: false },
-    MAX_MAGIC_ATTACK_RADIUS_SQUARED: { value: 16, writeable: false },
+    MAX_MAGIC_ATTACK_RADIUS_SQUARED: { value: 25, writeable: false },
     MAGIC_ATTACK_SPLASH_PERCENTAGE: { value: 0.75, writeable: false },
     MAX_MELEE_ATTACK_RADIUS_SQUARED: { value: 2, writeable: false },
 
@@ -7030,121 +7035,22 @@ TileFactory.createTile = function (terrain) {
 module.exports = TileFactory;
 
 },{"./GameObjects/TerrainType":52,"./GameObjects/Tile":53}],85:[function(require,module,exports){
-/*
- - REMEMBER TO ESCAPE BACKTICKS
- - TABS CREATE BLOCKQUOTES IN MARKDOWN
- */
 
-var levelOne = `In this level you need to make your way to exit! (marked by /)
+var levelOne = "In this level you need to make your way to exit! (marked by `/`)\n\n" + "In the API pay special attention to the `PlayerController.senseDirectionToExit()` function, e.g.:\n" + "```js\n" + "console.log('Round', this.pc.getGameRound());\n" + "var direction = this.pc.senseDirectionToExit();\n" + "if (this.pc.canMove(direction)) {\n" + "    console.log('Moving', direction.toString());\n" + "    this.pc.move(direction);\n" + "    return;\n" + "}\n" + "console.log('cannot move!');\n" + "```\n" + "Your current player is quite dumb and won't be able to make there without your help!\n\n" + "__TIP:__ [Console output will be helpful in debugging your AI!](http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers#77337)\n";
 
-In the API pay special attention to the \`PlayerController.senseDirectionToExit()\` function, e.g.:
+var levelTwo = "In this level several walls block your way!\n\n" + "You will need to add some advanced path finding later, but for now you should pay close attention to \`Direction.rotateLeft()\`, \`rotateRight()\`!\n" + "If a wall is blocking your path, often the best choice is to rotate until you find a clear direction!\n\n" + "```js\n" + "var direction = this.pc.senseDirectionToExit();\n" + "var idx = 0;\n" + "while (!this.pc.canMove(direction) && idx < 10) {\n" + "    console.log('rotating left!')\n" + "    direction = direction.rotateLeft();\n" + "}\n" + "if (this.pc.canMove(direction)) {\n" + "    console.log('Moving', direction.toString());\n" + "    this.pc.move(direction);\n" + "    return;\n" + "}\n" + "console.log('cannot move!');\n" + "```\n" + "__TIP:__ Make sure to check out the Raid API below!\n";
 
-\`\`\`js
-console.log("Round", this.pc.getGameRound());
-var direction = this.pc.senseDirectionToExit();
-if (this.pc.canMove(direction)) {
-    console.log("Moving", direction.toString());
-    this.pc.move(direction);
-    return;
-}
-console.log("can't move!");
-\`\`\`
+var levelThree = "In this level you face your first opponent, a giant frog!\n" + "Use `this.pc.senseNearbyUnits()` to see if there are any nearby enemies.\n\n" + "You should be able to easily defeat the giant frog using `canMeleeAttack` and `meleeAttack` when adjacent to the giant frog!\n" + "```js\n" + "var units = this.pc.senseNearbyUnits();\n" + "for (var i = 0; i < units.length; i++) {\n" + "    if (this.pc.canMeleeAttack(units[i].location)) {\n" + "        console.log('melee attacking unit at location ', units[i].location.toString());\n" + "        this.pc.meleeAttack(units[i].location);\n" + "        return;\n" + "    }\n" + "}\n" + "console.log('Cannot melee attack anything!');\n" + "```";
 
-Your current player is quite dumb and won't be able to make there without your help!
+var levelFour = "In this level you face several giant frogs!\n" + "Use what you've learned last level and you should be fine.\n" + "Note that always turning left might not always be the best choice, can you find a different way?\n";
 
-__TIP:__ [Console output will be helpful in debugging your AI!](http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers#77337)`;
+var levelFive = "In this level you face a swarm of gnats!\n" + "Gnats are fast but have very low HP (4)\n\n" + "Kill them with magic if you want to survive! Magic attacks do splash damage (check out GameConstants) so you should be able to kill multiple gnats at once!\n" + "```js\n" + "var units = this.pc.senseNearbyUnits();\n" + "for (var i = 0; i < units.length; i++) {\n" + "    if (this.pc.canMagicAttack(units[i].location)) {\n" + "        console.log('magic attacking unit at location ', units[i].location.toString());\n" + "        this.pc.magicAttack(units[i].location);\n" + "        return;\n" + "    }\n" + "}\n" + "console.log('Cannot magic attack anything!');\n" + "```";
 
-var levelTwo = `In this level several walls block your way!
+var levelSix = "In this level you face your first ranged enemy, a quill boar!\n" + "Kill them it with rangedAttack if you want to survive! Ranged attacks are powerfull at range, but have a minimum attack distance (see GameConstants)\n" + "```js\n" + "var units = this.pc.senseNearbyUnits();\n" + "for (var i = 0; i < units.length; i++) {\n" + "    if (this.pc.canRangedAttack(units[i].location)) {\n" + "        console.log('ranged attacking unit at location ', units[i].location.toString());\n" + "        this.pc.rangedAttack(units[i].location);\n" + "        return;\n" + "    }\n" + "}\n" + "console.log('Cannot ranged attack anything!');\n" + "```";
 
-You will need to add some advanced path finding later, but for now you should pay close attention to \`Direction.rotateLeft()\`, \`rotateRight()\`!
+var levelSeven = "In this level you face off against an evil necromancer!\n" + "You'll have to use all that you have learned to defeat him.\n" + "You may even need to heal. Make sure to check your hp before healing!`;\n" + "\n" + "```js\n" + "if (this.pc.getHp() < 100) {\n" + "    this.pc.heal();\n" + "}\n" + "```";
 
-If a wall is blocking your path, often the best choice is to rotate until you find a clear direction!
-
-\`\`\`js
-var direction = this.pc.senseDirectionToExit();
-var idx = 0;
-while (!this.pc.canMove(direction) && idx < 10) {
-    console.log("rotating left!")
-    direction = direction.rotateLeft();
-}
-if (this.pc.canMove(direction)) {
-    console.log("Moving", direction.toString());
-    this.pc.move(direction);
-    return;
-}
-console.log("can't move!");
-\`\`\``;
-
-var levelThree = `In this level you face your first opponent, a giant frog!
-
-Use \`this.pc.senseNearbyUnits()\` to see if there are any nearby enemies.
-
-You should be able to easily defeat the giant frog using canMeleeAttack and meleeAttack when adjacent to the giant frog!
-
-\`\`\`js
-var units = this.pc.senseNearbyUnits();
-for (var i = 0; i < units.length; i++) {
-    if (this.pc.canMeleeAttack(units[i].location)) {
-        console.log("attacking unit at location ", units[i].location.toString());
-        this.pc.meleeAttack(units[i].location);
-        return;
-    }
-}
-console.log("Can't melee attack anything!");
-\`\`\``;
-
-var levelFour = `In this level you face several giant frogs!
-
-Use what you've learned last level and you should be fine.
-
-Note that always turning left might not always be the best choice, can you find a different way?`;
-
-var levelFive = `In this level you face a swarm of gnats!
-
-Gnats are fast but have very low HP (1)
-
-Kill them with magic if you want to survive! Magic attacks do splash damage so should be able to kill multiple gnats at once!
-
-\`\`\`js
-var units = this.pc.senseNearbyUnits();
-for (var i = 0; i < units.length; i++) {
-    if (this.pc.canMagicAttack(units[i].location)) {
-        console.log("magic attacking unit at location ", units[i].location.toString());
-        this.pc.magicAttack(units[i].location);
-        return;
-    }
-}
-console.log("Can't magic attack anything!");
-\`\`\``;
-
-var levelSix = `In this level you face your first ranged enemy, a quill boar!
-
-Kill them it with rangedAttack if you want to survive! Ranged attacks are powerfull at range, but have a minimum attack distance (see GameConstants)
-
-
-\`\`\`js
-var units = this.pc.senseNearbyUnits();
-for (var i = 0; i < units.length; i++) {
-    if (this.pc.canRangedAttack(units[i].location)) {
-        console.log("ranged attacking unit at location ", units[i].location.toString());
-        this.pc.rangedAttack(units[i].location);
-        return;
-    }
-}
-console.log("Can't ranged attack anything!");
-\`\`\``;
-
-var levelSeven = `In this level you face off against an evil necromancer!
-
-You'll have to use all that you have learned to defeat him.
-
-You may even need to heal. Make sure to check your hp before healing!`;
-
-var complete = `__Congratulations__, you have beat the tutorial!
-
-Your player has been saved to local storage (unless you don't allow that sort of thing!). You can also copy your code, of course.
-
-Now refresh this page and take on __Adventure Mode__!`;
+var complete = "`__Congratulations__, you have beat the tutorial!\n" + "Your player has been saved to local storage (unless you don't allow that sort of thing!). You can also copy your code, of course.\n" + "Now refresh this page and take on __Adventure Mode__!";
 
 function getMDForLevel(level) {
     switch (level) {
@@ -7247,7 +7153,7 @@ UnitController.prototype = {
         return this.gc.senseNearbyUnits(this.id, options);
     },
     senseNearbyUnitsFromTeam: function (team) {
-        return this.gc.senseNearbyUnits(this.id, { team: team });
+        return this.gc.senseNearbyUnits(this.id, { "team": team });
     },
     senseNearbyEnemies: function () {
         return this.gc.senseNearbyUnits(this.id, { enemiesOnly: true });
@@ -7462,7 +7368,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "defeatPoints": 5,
                 "location": location,
                 "movementDelay": 1,
-                "meleeAttackPower": 6,
+                "meleeAttackPower": 5,
                 "meleeAttackDelay": 1,
                 "magicAttackPower": 0,
                 "magicAttackDelay": 0,
@@ -7629,7 +7535,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "rangedAttackDelay": 2,
                 "sensorRadiusSquared": 64,
                 "alertRadiusSquared": 36,
-                "spawnDelay": 15,
+                "spawnDelay": 12,
                 "spawnedUnitType": UnitType.SKELETON
             };
             return new Unit(stats);
