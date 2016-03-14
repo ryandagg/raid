@@ -396,8 +396,8 @@ var API = React.createClass({
                             <Panel header="bool canSense(MapLocation m)" eventKey="14">
                                 Returns true if m is in this units sensor range.
                             </Panel>
-                            <Panel header="bool senseIfWall(MapLocation m)" eventKey="15">
-                                Returns true if location m is a wall.
+                            <Panel header="bool senseIfPassable(MapLocation m)" eventKey="15">
+                                Returns true if location m is a traversable.
                             </Panel>
                             <Panel header="UnitInfo senseUnitAtLocation(MapLocation m)" eventKey="16">
                                 Senses the unit at that location.
