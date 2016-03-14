@@ -1562,6 +1562,8 @@ module.exports = {
 
 },{}],3:[function(require,module,exports){
 var Direction = require('./GameObjects/Direction');
+var MapLocation = require('./GameObjects/MapLocation');
+var Team = require('./Team');
 var GameConstants = require('./GameConstants');
 
 function getPlayerFromCode(playerCode) {
@@ -1576,7 +1578,7 @@ function getPlayerFromCode(playerCode) {
 
 module.exports = getPlayerFromCode;
 
-},{"./GameConstants":48,"./GameObjects/Direction":50}],4:[function(require,module,exports){
+},{"./GameConstants":48,"./GameObjects/Direction":50,"./GameObjects/MapLocation":51,"./Team":83}],4:[function(require,module,exports){
 
 var UnitController = require('./UnitController');
 var GameController = require('./GameController');
