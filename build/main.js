@@ -2178,8 +2178,9 @@ MoveWithFriendSmart.prototype.act = function () {
         if (this.distToPlayer(friend.location) <= this.distToPlayer() - 16 || this.distToPlayer(friend.location) <= 25 || this.distToPlayer() <= 36 || friend.hp < friend.maxHp || this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp) {
 
             dir = this.cc.smartNextDirectionTo(playerLoc);
-            if (this.cc.canMove(dir)) {
-                this.cc.move(dir);
+            if (MoveUtils.tryMoveAheadLeftRight(dir)) {
+                return true;
+            } else if (MoveUtils.tryMoveAheadLeftRightSideways(dir)) {
                 return true;
             }
         }
@@ -7557,7 +7558,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "hint": "They will alert their friends when they see you.",
                 "team": Team.CREEP,
                 "type": unitType,
-                "maxHp": 60,
+                "maxHp": 54,
                 "location": location,
                 "movementDelay": 4,
                 "meleeAttackPower": 4,
