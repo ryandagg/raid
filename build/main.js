@@ -2169,13 +2169,18 @@ MoveWithFriendSmart.prototype.act = function () {
     var ourLoc = this.cc.getCurrentLocation();
     var toPlayer = ourLoc.directionTo(playerLoc);
     var friends = this.cc.senseNearbyUnitsFromTeam(this.cc.getSelfInfo().team);
+    var dir;
 
     //Let's see if there is a creep as close or closer than us, and approach at the same rate that it does.
     //Intended for pack animals.
     for (var i = 0; i < friends.length; i++) {
         var friend = friends[i];
         if (this.distToPlayer(friend.location) <= this.distToPlayer() - 16) {
-            return this.cc.smartNextDirectionTo(playerLoc);
+            dir = this.cc.smartNextDirectionTo(playerLoc);
+            if (this.cc.canMove(dir)) {
+                this.cc.move(dir);
+                return true;
+            }
         }
     }
 
