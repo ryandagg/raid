@@ -1627,6 +1627,10 @@ CreepController.prototype.setInactive = function () {
     this.gc.setInactive(this.id);
 };
 
+CreepController.prototype.canMove = function (dir) {
+    return this.gc.canMove(this.id, dir);
+};
+
 CreepController.prototype.canSpawn = function (unitType, dir) {
     if (!unitType || !Direction.isValidDirection(dir)) {
         throw Error("null or invalid input");
@@ -3535,11 +3539,11 @@ GameController.senseExitIfClose = function (id) {
     }
 };
 
-GameController.trySenseIsWall = function (id, loc) {
+GameController.trySenseIsPassable = function (id, loc) {
     if (!GameController.canSense(id, loc)) {
         throw Error("can't sense that location");
     }
-    return map.isWall(loc);
+    return map.isOnMap(loc) && map.isPassable(loc);
 };
 
 GameController.getPlayerInfo = function (id) {
@@ -7230,7 +7234,7 @@ UnitController.prototype = {
         if (!this.canSense(loc)) {
             throw Error("Can't sense that location! " + loc);
         }
-        return this.gc.trySenseIsWall(this.id, loc);
+        return this.gc.trySenseIsPassable(this.id, loc);
     },
     senseUnitAtLocation: function (loc) {
         if (!loc) {
