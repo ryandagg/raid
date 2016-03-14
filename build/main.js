@@ -2175,7 +2175,7 @@ MoveWithFriendSmart.prototype.act = function () {
     //Intended for pack animals.
     for (var i = 0; i < friends.length; i++) {
         var friend = friends[i];
-        if (this.distToPlayer(friend.location) <= this.distToPlayer() - 16 || this.distToPlayer(friend.location) <= 25 || this.distToPlayer() <= 36 || this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp) {
+        if (this.distToPlayer(friend.location) <= this.distToPlayer() - 16 || this.distToPlayer(friend.location) <= 25 || this.distToPlayer() <= 36 || friend.hp < friend.maxHp || this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp) {
 
             dir = this.cc.smartNextDirectionTo(playerLoc);
             if (this.cc.canMove(dir)) {
