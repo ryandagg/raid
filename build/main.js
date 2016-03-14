@@ -586,8 +586,8 @@ var API = React.createClass({
                         ),
                         React.createElement(
                             Panel,
-                            { header: 'bool senseIfWall(MapLocation m)', eventKey: '15' },
-                            'Returns true if location m is a wall.'
+                            { header: 'bool senseIfPassable(MapLocation m)', eventKey: '15' },
+                            'Returns true if location m is a traversable.'
                         ),
                         React.createElement(
                             Panel,
