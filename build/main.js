@@ -1882,13 +1882,22 @@ KiteWithFriendDumb.prototype.act = function () {
     var friendNearby = this.cc.senseNearbyUnitsFromTeam(this.cc.getSelfInfo().team).length > 0;
 
     if (friendNearby) {
-        if (this.cc.canRangedAttack(playerLoc)) {
-            this.cc.rangedAttack(playerLoc);
-            return true;
+        if (this.cc.getSelfInfo().rangedAttackPower > 0) {
+            if (this.cc.canRangedAttack(playerLoc)) {
+                this.cc.rangedAttack(playerLoc);
+                return true;
+            }
+            if (distSqToPlayer < GameConstants.MIN_RANGED_ATTACK_RADIUS_SQUARED) {
+                return MoveUtils.tryMoveAheadLeftRightSideways(this.cc, toPlayer.opposite());
+            } else {
+                return MoveUtils.tryMoveAheadLeftRightSideways(this.cc, toPlayer);
+            }
         }
-        if (distSqToPlayer < GameConstants.MIN_RANGED_ATTACK_RADIUS_SQUARED) {
-            return MoveUtils.tryMoveAheadLeftRightSideways(this.cc, toPlayer.opposite());
-        } else {
+        if (this.cc.getSelfInfo().meleeAttackPower > 0) {
+            if (this.cc.canMeleeAttack(playerLoc)) {
+                this.cc.meleeAttack(playerLoc);
+                return true;
+            }
             return MoveUtils.tryMoveAheadLeftRightSideways(this.cc, toPlayer);
         }
     }
@@ -7763,7 +7772,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "hint": "They are slow, don't let one get his hands on you though!",
                 "team": Team.CREEP,
                 "type": unitType,
-                "maxHp": 80,
+                "maxHp": 50,
                 "location": location,
                 "movementDelay": 5,
                 "meleeAttackPower": 3,
