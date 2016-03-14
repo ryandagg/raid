@@ -2100,6 +2100,10 @@ MoveToExitDumb.prototype.act = function () {
     var toExit = this.cc.senseDirectionToExit();
     var toPlayer = this.cc.getDirectionToPlayer();
 
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+        return true;
+    }
+
     var blocking = false;
     if (!this.cc.canMove(Direction.NORTH) && !this.cc.canMove(Direction.SOUTH) && this.cc.canMove(Direction.WEST) && this.cc.canMove(Direction.EAST)) {
         blocking = true;
@@ -7759,7 +7763,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "hint": "They are slow, don't let one get his hands on you though!",
                 "team": Team.CREEP,
                 "type": unitType,
-                "maxHp": 10,
+                "maxHp": 80,
                 "location": location,
                 "movementDelay": 5,
                 "meleeAttackPower": 3,
@@ -7893,7 +7897,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "hint": "Fast and annoying.",
                 "team": Team.CREEP,
                 "type": unitType,
-                "maxHp": 14,
+                "maxHp": 20,
                 "location": location,
                 "movementDelay": 1,
                 "meleeAttackPower": 6,
