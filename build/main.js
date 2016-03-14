@@ -142,6 +142,9 @@ var GameController = React.createClass({
     ultra: function () {
         this.props.setSpeed(75);
     },
+    zap: function () {
+        this.props.setSpeed(25);
+    },
     compileAndRun: function () {
         this.props.compile(this.props.playerCode);
     },
@@ -256,6 +259,11 @@ var GameController = React.createClass({
                             MenuItem,
                             { eventKey: '4', onSelect: this.ultra },
                             '4x'
+                        ),
+                        React.createElement(
+                            MenuItem,
+                            { eventKey: '5', onSelect: this.zap },
+                            '12x'
                         )
                     )
                 )
