@@ -2045,7 +2045,7 @@ MoveRandom.prototype.act = function () {
 
     var r = Math.floor(Math.random() * 5);
 
-    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(this.cc, toPlayer)) {
         return true;
     }
 
@@ -2090,7 +2090,7 @@ MoveToExitDumb.prototype.act = function () {
     var toExit = this.cc.senseDirectionToExit();
     var toPlayer = this.cc.getDirectionToPlayer();
 
-    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(this.cc, toPlayer)) {
         return true;
     }
 
@@ -2120,7 +2120,7 @@ MoveToExitDumb.prototype.act = function () {
     var toExit = this.cc.senseDirectionToExit();
     var toPlayer = this.cc.getDirectionToPlayer();
 
-    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(this.cc, toPlayer)) {
         return true;
     }
 
@@ -2165,7 +2165,7 @@ MoveToExitRandom.prototype.act = function () {
 
     var r = Math.floor(Math.random() * 4);
 
-    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(this.cc, toPlayer)) {
         return true;
     }
 
