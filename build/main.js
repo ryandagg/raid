@@ -3170,7 +3170,7 @@ GameController.alertAllies = function (id) {
             if (loc.distanceSquaredTo(unit.location) <= unit.alertRadiusSquared) {
                 var target = map.getUnitAtLoc(loc);
                 if (target) {
-                    if (target.type === unit.type || target.type === unit.spawnedUnitType || target.team === unit.team) {
+                    if (unit.alertRadiusSquared === 1000 || target.type === unit.type || target.type === unit.spawnedUnitType) {
                         target.activate();
                     }
                 }
@@ -7241,7 +7241,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "rangedAttackPower": 0,
                 "rangedAttackDelay": 0,
                 "sensorRadiusSquared": 1000,
-                "alertRadiusSquared": 1000,
+                "alertRadiusSquared": 0,
                 "spawnDelay": 0,
                 "spawnedUnitType": null
             };
@@ -8265,7 +8265,7 @@ UnitFactory.createUnit = function (unitType, location) {
                 "rangedAttackPower": 0,
                 "rangedAttackDelay": 0,
                 "sensorRadiusSquared": 36,
-                "alertRadiusSquared": 100,
+                "alertRadiusSquared": 1000,
                 "spawnDelay": 0,
                 "spawnedUnitType": null
             };
