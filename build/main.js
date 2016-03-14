@@ -2178,9 +2178,9 @@ MoveWithFriendSmart.prototype.act = function () {
         if (this.distToPlayer(friend.location) <= this.distToPlayer() - 16 || this.distToPlayer(friend.location) <= 25 || this.distToPlayer() <= 36 || friend.hp < friend.maxHp || this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp) {
 
             dir = this.cc.smartNextDirectionTo(playerLoc);
-            if (MoveUtils.tryMoveAheadLeftRight(dir)) {
+            if (MoveUtils.tryMoveAheadLeftRight(this.cc, dir)) {
                 return true;
-            } else if (MoveUtils.tryMoveAheadLeftRightSideways(dir)) {
+            } else if (MoveUtils.tryMoveAheadLeftRightSideways(this.cc, dir)) {
                 return true;
             }
         }
