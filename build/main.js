@@ -430,7 +430,7 @@ var CanvasRenderer = React.createClass({
     }
 });
 
-var samplePlayer = ["function RaidPlayer(playerController) {", "  this.pc = playerController;", "}", "", "RaidPlayer.prototype = {", "  act: function() {", "    if(this.pc.canMove(Direction.SOUTH)) {", "      this.pc.move(Direction.SOUTH);", "      return;", "    }", "  }", "};"];
+var samplePlayer = ["function RaidPlayer(playerController) {", "  this.pc = playerController;", "}", "", "RaidPlayer.prototype = {", "  act: function() {", "    var direction = Direction.randomDirection()", "    if(this.pc.canMove(direction)) {", "      this.pc.move(direction);", "      return;", "    }", "  }", "};"];
 
 var PlayerCode = React.createClass({
     displayName: 'PlayerCode',
