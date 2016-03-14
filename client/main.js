@@ -503,6 +503,7 @@ var API = React.createClass({
                             <li><code>movementDelay</code> the delay incurred by movement.</li>
                             <li><code>healPower</code> how much HP the unit can heal.</li>
                             <li><code>healDelay</code> how much delay is incurred by healing (0 if can't heal).</li>
+                            <li><code>active</code>true/false a unit will not move or attack if it is not active. Units remain active until they are attacked, see you, or are alerted to your presence</li>
                             <li><code>meleeAttackPower</code> how much damage a melee attack does.</li>
                             <li><code>meleeAttackDelay</code> how much delay is incurred by melee attack (0 if can't attack).</li>
                             <li><code>magicAttackPower</code> how much damage a magic attack does.</li>
