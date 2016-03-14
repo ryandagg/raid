@@ -3929,6 +3929,7 @@ function Unit(stats) {
     this.currentSpawnDelay = this.spawnDelay;
     this.spawnedUnitType = stats.spawnedUnitType || null;
     this.lazy = stats.lazy || false;
+    this.active = false;
 
     this.action = null;
     this.source = null;
@@ -4048,6 +4049,7 @@ function UnitInfo(info) {
     this.movementDelay = info.movementDelay;
     this.healPower = info.healPower || 0;
     this.healDelay = info.healDelay;
+    this.active = info.active;
     this.meleeAttackPower = info.meleeAttackPower || 0;
     this.meleeAttackDelay = info.meleeAttackDelay;
     this.magicAttackPower = info.magicAttackPower || 0;
