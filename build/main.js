@@ -2088,6 +2088,7 @@ MoveToExitDumb.prototype = Object.create(Base.prototype);
 
 MoveToExitDumb.prototype.act = function () {
     var toExit = this.cc.senseDirectionToExit();
+    var toPlayer = this.cc.getDirectionToPlayer();
 
     if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
         return true;
@@ -2160,6 +2161,7 @@ MoveToExitRandom.prototype = Object.create(Base.prototype);
 
 MoveToExitRandom.prototype.act = function () {
     var toExit = this.cc.senseDirectionToExit();
+    var toPlayer = this.cc.getDirectionToPlayer();
 
     var r = Math.floor(Math.random() * 4);
 
