@@ -2018,6 +2018,10 @@ MoveRandom.prototype.act = function () {
 
     var r = Math.floor(Math.random() * 5);
 
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+        return true;
+    }
+
     //give slightly more weight on moving towards the player.
     if (r === 0) {
         return MoveUtils.tryMoveAheadLeftRightSideways(this.cc, toPlayer);
@@ -2057,6 +2061,10 @@ MoveToExitDumb.prototype = Object.create(Base.prototype);
 
 MoveToExitDumb.prototype.act = function () {
     var toExit = this.cc.senseDirectionToExit();
+
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+        return true;
+    }
 
     return MoveUtils.tryMoveAheadLeftRightSideways(this.cc, toExit);
 };
@@ -2123,6 +2131,10 @@ MoveToExitRandom.prototype.act = function () {
     var toExit = this.cc.senseDirectionToExit();
 
     var r = Math.floor(Math.random() * 4);
+
+    if (this.cc.getMyInfo().hp < this.cc.getMyInfo().maxHp && MoveUtils.tryMoveAheadLeftRight(toPlayer)) {
+        return true;
+    }
 
     //give slightly more weight on moving towards the player.
     if (r === 0) {
@@ -6823,7 +6835,7 @@ PlayerFactory.createPlayerForUnit = function (unit, cc) {
         case UnitType.JELLY:
             return new ToExitMelee(cc);
         case UnitType.KILLER_BEETLE:
-            return new MeleePackPlayer(cc);
+            return new MeleePack(cc);
         case UnitType.LICH:
             return new MagicMeleePlayer(cc);
         case UnitType.MINOTAUR:
