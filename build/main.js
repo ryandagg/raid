@@ -1753,7 +1753,7 @@ module.exports = BehaviorBase;
 },{}],8:[function(require,module,exports){
 
 var MoveUtils = require('../../Utils/MoveUtils');
-var MoveUtils = require('../../GameObjects/Direction');
+var Direction = require('../../GameObjects/Direction');
 var Base = require('./Base');
 
 /**
