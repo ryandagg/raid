@@ -1063,6 +1063,16 @@ var API = React.createClass({
                             React.createElement(
                                 'code',
                                 null,
+                                'active'
+                            ),
+                            'true/false a unit will not move or attack if it is not active. Units remain active until they are attacked, see you, or are alerted to your presence'
+                        ),
+                        React.createElement(
+                            'li',
+                            null,
+                            React.createElement(
+                                'code',
+                                null,
                                 'meleeAttackPower'
                             ),
                             ' how much damage a melee attack does.'
