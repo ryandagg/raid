@@ -2022,7 +2022,8 @@ MoveCloserSmart.prototype = Object.create(Base.prototype);
 
 MoveCloserSmart.prototype.act = function () {
   var playerLoc = this.cc.getPlayerInfo().location;
-  return this.cc.smartNextDirectionTo(playerLoc);
+  var toPlayer = this.cc.smartNextDirectionTo(playerLoc);
+  return MoveUtils.tryMoveAheadLeftRightSideways(this.cc, toPlayer);
 };
 
 module.exports = MoveCloserSmart;
