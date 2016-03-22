@@ -535,7 +535,6 @@ var SplashScreen = React.createClass({
     },
     render: function() {
         var titleStyle = {fontSize: "400px",
-                        lineHeight: "350px",
                         width: "100%"
                         };
         return (
