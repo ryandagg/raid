@@ -300,44 +300,6 @@ var samplePlayer = [
     "};"
 ];
 
-var PlayerCode = React.createClass({
-    onPlayerUpdate: function(playerCode) {
-        localStorage.setItem("player", JSON.stringify(playerCode));
-        this.setState({"player": playerCode});
-    },
-    getInitialState: function() {
-        return {
-            "player": JSON.parse(localStorage.getItem("player")) || samplePlayer.join('\n')
-        }
-    },
-    onPlayerRun: function() {
-        this.props.compileAndStart(this.state.player);
-        return false;
-    },
-    render: function() {
-        return (
-            <form>
-                <Button onClick={this.onPlayerRun}>Run</Button>
-                <AceEditor
-                    fontSize={12}
-                    highlightActiveLine={true}
-                    label="RaidPlayer.js"
-                    maxLines={50}
-                    mode="javascript"
-                    onChange={this.onPlayerUpdate}
-                    ref="playerText"
-                    showPrintMargin={false}
-                    tabSize={2}
-                    theme="chrome"
-                    value={this.state.player}
-                    width="100%"
-                />
-            </form>
-            )
-
-    }
-});
-
 var API = React.createClass({
     //TODO: we need to change this to only return a subset if we are
     // on the tutorial levels
@@ -535,7 +497,6 @@ var SplashScreen = React.createClass({
     },
     render: function() {
         var titleStyle = {fontSize: "400px",
-                        lineHeight: "350px",
                         width: "100%"
                         };
         return (
@@ -818,6 +779,7 @@ var Raid = React.createClass({
                             theme="chrome"
                             value={this.state.playerCode}
                             width="100%"
+                            editorProps={{$blockScrolling: Infinity}}
                         />
                     </Col>
                     <Col xs={12} md={5} lg={5}>
