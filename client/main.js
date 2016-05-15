@@ -19,10 +19,11 @@ var PanelGroup = require('react-bootstrap').PanelGroup;
 var Well = require('react-bootstrap').Well;
 
 // react ace
-var AceEditor = require('react-ace');
+var AceEditor = require('react-ace').default;
 var brace  = require('brace');
 require('brace/mode/javascript');
 require('brace/theme/chrome');
+require('brace/ext/language_tools'); // @see https://github.com/securingsincity/react-ace/issues/95
 
 // game components
 var GameRunner = require('../lib/GameRunner');
@@ -767,19 +768,20 @@ var Raid = React.createClass({
                 <Row>
                     <Col xs={12} md={7} lg={7}>
                         <AceEditor
-                            fontSize={12}
-                            highlightActiveLine={true}
-                            label="RaidPlayer.js"
-                            maxLines={50}
+                            name="playerText"
                             mode="javascript"
-                            onChange={this.onPlayerCodeUpdate}
-                            ref="playerText"
-                            showPrintMargin={false}
-                            tabSize={2}
                             theme="chrome"
-                            value={this.state.playerCode}
                             width="100%"
+                            fontSize={12}
+                            showPrintMargin={false}
+                            highlightActiveLine={true}
+                            maxLines={50}
+                            tabSize={2}
+                            value={this.state.playerCode}
+                            onChange={this.onPlayerCodeUpdate}
                             editorProps={{$blockScrolling: Infinity}}
+                            label="RaidPlayer.js"
+                            ref="playerText"
                         />
                     </Col>
                     <Col xs={12} md={5} lg={5}>
