@@ -1,13 +1,14 @@
 {
   "name": "raid",
   "version": "0.0.1",
-  "description": "Rougue AI Dungeon!.",
+  "description": "Rogue AI Dungeon!.",
   "main": "client/main.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "build": "browserify -t [ babelify --presets [ react ] ] client/main.js -o build/main.js",
+    "dev": "watchify -t [ babelify --presets [ react ] ] client/main.js -o build/main.js",
     "serve": "python -m SimpleHTTPServer"
   },
   "repository": {
@@ -27,13 +28,16 @@
     "babel-preset-react": "^6.5.0",
     "babelify": "^7.3.0",
     "brace": "^0.8.0",
+    "browserify": "^16.2.3",
     "clone": "^1.0.2",
     "generate-maze-by-clustering": "0.0.4",
     "pathfinding": "^0.4.18",
+    "raid-runner": "^0.0.1",
     "react": "^15.0.2",
     "react-ace": "^3.4.1",
     "react-bootstrap": "^0.29.4",
     "react-dom": "^15.0.2",
-    "react-markdown": "^2.2.0"
+    "react-markdown": "^2.2.0",
+    "watchify": "^3.11.1"
   }
 }

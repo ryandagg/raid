@@ -570,7 +570,7 @@ var Raid = React.createClass({
         return {
             "gameRunner": gR,
             "game": null,
-            "mode": null,
+            "mode": ADVENTURE, // todo: base this off of an environmental variable
             "level": 1,
             "message": "Welcome!",
             "renderer": GameConstants.RENDER_WITH_CANVAS ? "canvas" : "table",
