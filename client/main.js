@@ -374,6 +374,15 @@ var API = React.createClass({
                             <Panel header="MapLocation senseExitLocIfClose()" eventKey="19">
                                 Senses the location of the exit if you are close enough;
                             </Panel>
+                            <Panel header="MapLocation findPath(map: MapLocation[][], start: MapLocation, end: MapLocation)" eventKey="20">
+                                Creates a path Array from a start and end MapLocation.
+                            </Panel>
+                            <Panel header="Direction nextDirTo(map: MapLocation[][], start: MapLocation, end: MapLocation)" eventKey="21">
+                                Determines what direction to take next to get from start to end.
+                            </Panel>
+                            <Panel header="Pathfinder Grid terrainToPFArray(map: MapLocation[][])" eventKey="22">
+                                Turns a regular MapLocation array (with lots of information) in to a simpler array that pathfinding can work with.
+                            </Panel>
 
                         </Accordion>
                     </Panel>
@@ -709,7 +718,7 @@ var Raid = React.createClass({
             var renderer = null;
             if(this.state.renderer == "canvas"){
                 mainContent = (
-                        <CanvasRenderer 
+                        <CanvasRenderer
                             canvas={this.state.canvas}
                             setZoom={this.setZoom}
                             currentZoomFactor={this.state.currentZoomFactor} />
