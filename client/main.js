@@ -380,7 +380,7 @@ var API = React.createClass({
                             <Panel header="Direction nextDirTo(map: MapLocation[][], start: MapLocation, end: MapLocation)" eventKey="21">
                                 Determines what direction to take next to get from start to end.
                             </Panel>
-                            <Panel header="Pathfinder Grid terrainToPFArray(map: MapLocation[][])" eventKey="22">
+                            <Panel header="PF.Grid terrainToPFArray(map: MapLocation[][])" eventKey="22">
                                 Turns a regular MapLocation array (with lots of information) in to a simpler array that pathfinding can work with.
                             </Panel>
 
